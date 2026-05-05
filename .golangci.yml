@@ -1,0 +1,23 @@
+run:
+  timeout: 3m
+
+linters:
+  disable-all: true
+  enable:
+    - errcheck
+    - gofmt
+    - goimports
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+
+issues:
+  exclude-dirs:
+    - shared/reveal
+  exclude-rules:
+    # Teaching examples often have intentionally simple main() functions.
+    - path: lessons/.*/(exercises|solutions)/
+      linters:
+        - errcheck

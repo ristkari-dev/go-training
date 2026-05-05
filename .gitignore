@@ -1,2 +1,14 @@
 .DS_Store
 dist/
+
+# Go build artifacts
+*.exe
+*.test
+*.out
+
+# Editor
+.idea/
+.vscode/
+
+# Slide build output (Plan B)
+dist/
