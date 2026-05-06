@@ -44,12 +44,12 @@ func main() {
 }
 
 func runWithArgs(args []string) int {
-	fs := flag.NewFlagSet(args[0], flag.ContinueOnError)
-	fs.SetOutput(os.Stderr)
-	lesson := fs.String("lesson", "", "lesson name (e.g. 01-hello)")
-	addr := fs.String("addr", ":8000", "listen address")
-	repo := fs.String("repo", ".", "repo root containing lessons/ and shared/")
-	if err := fs.Parse(args[1:]); err != nil {
+	flags := flag.NewFlagSet(args[0], flag.ContinueOnError)
+	flags.SetOutput(os.Stderr)
+	lesson := flags.String("lesson", "", "lesson name (e.g. 01-hello)")
+	addr := flags.String("addr", ":8000", "listen address")
+	repo := flags.String("repo", ".", "repo root containing lessons/ and shared/")
+	if err := flags.Parse(args[1:]); err != nil {
 		return 2
 	}
 	if *lesson == "" {

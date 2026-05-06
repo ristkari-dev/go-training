@@ -101,8 +101,8 @@ func TestScaffoldRefusesExistingDest(t *testing.T) {
 }
 
 func TestCLIRejectsMissingName(t *testing.T) {
-	if code := runWithArgs([]string{"new-lesson"}); code == 0 {
-		t.Fatal("expected non-zero exit when -name is missing")
+	if code := runWithArgs([]string{"new-lesson"}); code != 2 {
+		t.Fatalf("expected exit 2, got %d", code)
 	}
 }
 

@@ -113,11 +113,11 @@ func main() {
 // runWithArgs parses args[1:] as flags and runs the scaffolder.
 // It returns the desired process exit code so it can be unit-tested.
 func runWithArgs(args []string) int {
-	fs := flag.NewFlagSet(args[0], flag.ContinueOnError)
-	fs.SetOutput(os.Stderr)
-	name := fs.String("name", "", "lesson name in NN-kebab-case (e.g. 01-hello)")
-	out := fs.String("out", "lessons", "output base directory")
-	if err := fs.Parse(args[1:]); err != nil {
+	flags := flag.NewFlagSet(args[0], flag.ContinueOnError)
+	flags.SetOutput(os.Stderr)
+	name := flags.String("name", "", "lesson name in NN-kebab-case (e.g. 01-hello)")
+	out := flags.String("out", "lessons", "output base directory")
+	if err := flags.Parse(args[1:]); err != nil {
 		return 2
 	}
 	if *name == "" {
