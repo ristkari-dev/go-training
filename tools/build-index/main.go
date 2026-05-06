@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"embed"
 	"errors"
+	"flag"
 	"fmt"
 	"html/template"
 	"io"
@@ -170,5 +171,22 @@ func build(lessonsDir, sharedDir, outDir string) error {
 }
 
 func main() {
-	// Wired in Task 3.
+	os.Exit(runWithArgs(os.Args))
+}
+
+func runWithArgs(args []string) int {
+	flags := flag.NewFlagSet(args[0], flag.ContinueOnError)
+	flags.SetOutput(os.Stderr)
+	lessonsDir := flags.String("lessons", "lessons", "directory containing lesson folders")
+	sharedDir := flags.String("shared", "shared/reveal", "directory containing shared reveal.js assets")
+	outDir := flags.String("out", "dist", "output directory")
+	if err := flags.Parse(args[1:]); err != nil {
+		return 2
+	}
+	if err := build(*lessonsDir, *sharedDir, *outDir); err != nil {
+		fmt.Fprintln(os.Stderr, "error:", err)
+		return 1
+	}
+	fmt.Printf("built %s\n", *outDir)
+	return 0
 }
