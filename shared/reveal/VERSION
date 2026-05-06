@@ -1,0 +1,4 @@
+reveal.js 5.1.0
+Source: https://github.com/hakimel/reveal.js/releases/tag/5.1.0
+Vendored: 2026-05-05
+Upgrade: re-download the tarball, replace dist/ and plugin/, update this file.
