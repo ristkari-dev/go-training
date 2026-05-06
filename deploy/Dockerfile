@@ -5,7 +5,7 @@ FROM golang:1.23-alpine AS builder
 WORKDIR /src
 
 # Cache deps separately
-COPY go.mod ./
+COPY go.mod go.sum ./
 RUN go mod download
 
 # Copy everything else and build
