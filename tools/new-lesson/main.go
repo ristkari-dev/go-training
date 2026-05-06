@@ -98,8 +98,11 @@ func walkTemplate(srcFS fs.FS, root, dest string, info lessonInfo) error {
 		if err != nil {
 			return err
 		}
-		defer f.Close()
-		return tmpl.Execute(f, info)
+		if err := tmpl.Execute(f, info); err != nil {
+			_ = f.Close()
+			return err
+		}
+		return f.Close()
 	})
 }
 
