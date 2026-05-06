@@ -99,3 +99,20 @@ func TestScaffoldRefusesExistingDest(t *testing.T) {
 		t.Errorf("expected already-exists error, got %v", err)
 	}
 }
+
+func TestCLIRejectsMissingName(t *testing.T) {
+	if code := runWithArgs([]string{"new-lesson"}); code == 0 {
+		t.Fatal("expected non-zero exit when -name is missing")
+	}
+}
+
+func TestCLIScaffoldsHappyPath(t *testing.T) {
+	dest := t.TempDir()
+	code := runWithArgs([]string{"new-lesson", "-name", "07-packages", "-out", dest})
+	if code != 0 {
+		t.Fatalf("expected exit 0, got %d", code)
+	}
+	if _, err := os.Stat(filepath.Join(dest, "07-packages", "README.md")); err != nil {
+		t.Fatalf("README not created: %v", err)
+	}
+}

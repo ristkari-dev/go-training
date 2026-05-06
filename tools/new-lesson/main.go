@@ -5,6 +5,7 @@ package main
 import (
 	"embed"
 	"errors"
+	"flag"
 	"fmt"
 	"io/fs"
 	"os"
@@ -103,5 +104,27 @@ func walkTemplate(srcFS fs.FS, root, dest string, info lessonInfo) error {
 }
 
 func main() {
-	// Wired in Task 7.
+	os.Exit(runWithArgs(os.Args))
+}
+
+// runWithArgs parses args[1:] as flags and runs the scaffolder.
+// It returns the desired process exit code so it can be unit-tested.
+func runWithArgs(args []string) int {
+	fs := flag.NewFlagSet(args[0], flag.ContinueOnError)
+	fs.SetOutput(os.Stderr)
+	name := fs.String("name", "", "lesson name in NN-kebab-case (e.g. 01-hello)")
+	out := fs.String("out", "lessons", "output base directory")
+	if err := fs.Parse(args[1:]); err != nil {
+		return 2
+	}
+	if *name == "" {
+		fmt.Fprintln(os.Stderr, "error: -name is required (e.g. -name 01-hello)")
+		return 2
+	}
+	if err := scaffoldLesson(*name, *out); err != nil {
+		fmt.Fprintln(os.Stderr, "error:", err)
+		return 1
+	}
+	fmt.Printf("created lesson %s under %s/\n", *name, *out)
+	return 0
 }
