@@ -1,0 +1,32 @@
+server {
+    listen ${PORT} default_server;
+    listen [::]:${PORT} default_server;
+    server_name _;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # Static assets: cache for an hour
+    location ~* \.(?:js|mjs|css|svg|woff2?|ttf|otf|png|jpg|jpeg|gif|ico|map)$ {
+        expires 1h;
+        add_header Cache-Control "public, max-age=3600";
+        try_files $uri =404;
+    }
+
+    # HTML and markdown: no cache (so deploys propagate immediately)
+    location ~* \.(?:html|md)$ {
+        add_header Cache-Control "no-cache";
+        try_files $uri =404;
+    }
+
+    # Default: try the file, then a directory's index.html, else 404
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    # Favicon shouldn't 404 noisily if missing
+    location = /favicon.ico {
+        log_not_found off;
+        access_log off;
+    }
+}
