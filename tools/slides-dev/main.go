@@ -4,6 +4,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -39,5 +40,35 @@ func buildHandler(repo, lesson string) (http.Handler, error) {
 }
 
 func main() {
-	// Wired in Task 9.
+	os.Exit(runWithArgs(os.Args))
+}
+
+func runWithArgs(args []string) int {
+	fs := flag.NewFlagSet(args[0], flag.ContinueOnError)
+	fs.SetOutput(os.Stderr)
+	lesson := fs.String("lesson", "", "lesson name (e.g. 01-hello)")
+	addr := fs.String("addr", ":8000", "listen address")
+	repo := fs.String("repo", ".", "repo root containing lessons/ and shared/")
+	if err := fs.Parse(args[1:]); err != nil {
+		return 2
+	}
+	if *lesson == "" {
+		fmt.Fprintln(os.Stderr, "error: -lesson is required (e.g. -lesson 01-hello)")
+		return 2
+	}
+	h, err := buildHandler(*repo, *lesson)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "error:", err)
+		return 1
+	}
+	displayAddr := *addr
+	if len(displayAddr) > 0 && displayAddr[0] == ':' {
+		displayAddr = "localhost" + displayAddr
+	}
+	fmt.Printf("serving lesson %s on http://%s/  (Ctrl-C to stop)\n", *lesson, displayAddr)
+	if err := http.ListenAndServe(*addr, h); err != nil {
+		fmt.Fprintln(os.Stderr, "error:", err)
+		return 1
+	}
+	return 0
 }
