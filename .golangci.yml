@@ -1,3 +1,5 @@
+version: "2"
+
 run:
   timeout: 3m
 
@@ -5,9 +7,6 @@ linters:
   disable-all: true
   enable:
     - errcheck
-    - gofmt
-    - goimports
-    - gosimple
     - govet
     - ineffassign
     - staticcheck
