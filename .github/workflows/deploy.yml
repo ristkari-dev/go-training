@@ -1,0 +1,66 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  REGION: europe-north1
+  AR_REPO: go-training
+  IMAGE_NAME: slides
+  SERVICE_NAME: go-training-slides
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - name: Build and push image
+        id: build
+        run: |
+          IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          docker build -t "$IMAGE" -f deploy/Dockerfile .
+          docker push "$IMAGE"
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+
+      - name: Render Cloud Run spec
+        run: |
+          sed "s|__IMAGE__|${{ steps.build.outputs.image }}|" deploy/cloudrun.yaml > /tmp/cloudrun.rendered.yaml
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run services replace /tmp/cloudrun.rendered.yaml \
+              --region=${{ env.REGION }} \
+              --project=${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Allow public access (idempotent)
+        run: |
+          gcloud run services add-iam-policy-binding ${{ env.SERVICE_NAME }} \
+              --region=${{ env.REGION }} \
+              --project=${{ secrets.GCP_PROJECT_ID }} \
+              --member=allUsers \
+              --role=roles/run.invoker || true
+
+      - name: Print service URL
+        run: |
+          gcloud run services describe ${{ env.SERVICE_NAME }} \
+              --region=${{ env.REGION }} \
+              --project=${{ secrets.GCP_PROJECT_ID }} \
+              --format='value(status.url)'
