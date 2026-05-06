@@ -56,7 +56,7 @@ jobs:
               --region=${{ env.REGION }} \
               --project=${{ secrets.GCP_PROJECT_ID }} \
               --member=allUsers \
-              --role=roles/run.invoker || true
+              --role=roles/run.invoker
 
       - name: Print service URL
         run: |
