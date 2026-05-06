@@ -1,0 +1,73 @@
+/*
+ * go-training: a reveal.js theme tuned for code-heavy slides.
+ * Builds on reveal.js's CSS variables; override only what we need.
+ */
+
+:root {
+  --r-background-color: #1f2430;
+  --r-main-color: #f4f4f4;
+  --r-main-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --r-main-font-size: 38px;
+  --r-heading-color: #5dc9e2;
+  --r-heading-font: var(--r-main-font);
+  --r-heading-text-shadow: none;
+  --r-heading-text-transform: none;
+  --r-heading1-size: 2.2em;
+  --r-heading2-size: 1.6em;
+  --r-heading3-size: 1.2em;
+  --r-link-color: #5dc9e2;
+  --r-link-color-hover: #ffffff;
+  --r-selection-color: #1f2430;
+  --r-selection-background-color: #5dc9e2;
+  --r-code-font: "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+}
+
+.reveal {
+  background-color: var(--r-background-color);
+  color: var(--r-main-color);
+}
+
+.reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+  color: var(--r-heading-color);
+  letter-spacing: -0.01em;
+}
+
+.reveal pre {
+  width: 100%;
+  font-size: 0.7em;
+  box-shadow: none;
+  border-radius: 6px;
+}
+
+.reveal pre code {
+  padding: 1em 1.2em;
+  max-height: 600px;
+  line-height: 1.4;
+  font-family: var(--r-code-font);
+}
+
+.reveal code {
+  font-family: var(--r-code-font);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.05em 0.3em;
+  border-radius: 3px;
+}
+
+.reveal section img {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.reveal blockquote {
+  background: rgba(255, 255, 255, 0.05);
+  border-left: 4px solid var(--r-heading-color);
+  padding: 0.5em 1em;
+  font-style: normal;
+}
+
+.reveal .slide-number {
+  font-family: var(--r-code-font);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.4);
+}
