@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Go Training</title>
+  <style>
+    :root {
+      --bg: #1f2430;
+      --fg: #f4f4f4;
+      --accent: #5dc9e2;
+      --muted: rgba(255, 255, 255, 0.55);
+      --code-font: "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+      --main-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    body { margin: 0; padding: 3rem 1.5rem; background: var(--bg); color: var(--fg); font: 16px/1.6 var(--main-font); }
+    main { max-width: 720px; margin: 0 auto; }
+    h1 { font-size: 2.4rem; color: var(--accent); margin: 0 0 0.4rem; letter-spacing: -0.01em; }
+    p.lead { color: var(--muted); margin: 0 0 2.5rem; }
+    ol.lessons { list-style: none; padding: 0; margin: 0; }
+    ol.lessons li { display: flex; align-items: baseline; padding: 0.7rem 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    ol.lessons li .num { font-family: var(--code-font); color: var(--muted); width: 3.5rem; flex-shrink: 0; }
+    ol.lessons li a { color: var(--fg); text-decoration: none; flex: 1; }
+    ol.lessons li a:hover { color: var(--accent); }
+    .empty { color: var(--muted); padding: 1rem 0; font-style: italic; }
+    footer { color: var(--muted); margin-top: 3rem; font-size: 0.9rem; }
+    footer a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Go Training</h1>
+    <p class="lead">A Go programming course delivered as code + per-lesson reveal.js slide decks.</p>
+    {{if .Lessons}}
+    <ol class="lessons">
+      {{range .Lessons}}
+      <li>
+        <span class="num">{{.Number}}</span>
+        <a href="lessons/{{.Name}}/slides/">{{.Title}}</a>
+      </li>
+      {{end}}
+    </ol>
+    {{else}}
+    <p class="empty">No lessons published yet.</p>
+    {{end}}
+    <footer>
+      Source: <a href="https://github.com/ristkari-dev/go-training">github.com/ristkari-dev/go-training</a>
+    </footer>
+  </main>
+</body>
+</html>
