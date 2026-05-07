@@ -15,7 +15,7 @@ markers — fill them in.
 Every lesson has exactly these four parts:
 
 1. **`README.md`** — self-study notes that mirror the deck narrative.
-   Sections: Learning goals, Prerequisites, Concepts, Exercise, How to run,
+   Sections: Learning goals, Prerequisites, Concepts, Exercise: warm-up, Exercise: main, How to run,
    Going further.
 2. **`slides/`** — the live-lecture deck. `index.html` is reveal.js bootstrap;
    `slides.md` is the markdown content. Use `Note:` blocks for speaker notes.
@@ -40,6 +40,64 @@ Exercise tests fail by design until the student completes the lesson.
 `make test` excludes `*/exercises/*` so CI stays green; students opt in with
 `make test-lesson LESSON=NN-name` (which runs both exercise and solution
 tests, ignoring exercise failures).
+
+## Phase 1 conventions (lessons 1-8)
+
+Phase 1 of the course (Foundations) introduces additional conventions on top of the four-part structure. The lesson scaffolder produces them by default; this section explains them.
+
+### Warm-up + main exercise pattern
+
+Every Phase 1 lesson has two exercises: a 5-10 minute warm-up that builds muscle memory for the lesson's key concept, and a 30-45 minute main exercise that applies it. They live alongside each other in the same Go package:
+
+```
+lessons/NN-name/exercises/
+├── warmup.go         # exported names use a Warmup* prefix
+├── warmup_test.go
+├── main.go           # exported names are unprefixed
+└── main_test.go
+```
+
+The `Warmup*` prefix on warm-up identifiers is mandatory. Two exercises in one package would otherwise collide on names like `Greet` or `Format`. The scaffolder's default warm-up exports `WarmupGreet` to model the pattern.
+
+The same applies to `solutions/`.
+
+**Lesson 7 onwards** uses subfolders instead of flat layout — that change is taught explicitly in the packages lesson, so it's not the default scaffold.
+
+### Heavy-explanatory slide style
+
+Phase 1 lessons use a textbook-flavoured slide pattern. For each concept the slides include:
+
+1. **Motivation** — why the concept exists, what problem it solves.
+2. **The basics** — a minimal code example.
+3. **A worked example** — a substantive example using the concept in context.
+4. **Common mistake** — what NOT to do, plus the bug the compiler/runtime surfaces.
+5. **Recap** — a bullet list of takeaways.
+
+The scaffolder's `slides.md.tmpl` pre-stocks three concept blocks following this pattern. Expand or contract per lesson.
+
+Slide prose is self-readable. Use `Note:` blocks for live-lecture-only commentary.
+
+### When students start writing tests
+
+Through lessons 1-3, exercises ship pre-written failing tests that students don't author themselves — they just edit the `.go` files until the tests pass. From **lesson 4 onward**, students write some test code themselves.
+
+### Going further
+
+Each lesson's README ends with a `## Going further` section split into two parts:
+
+- **Read** — 1-3 short links (Go blog posts, std-lib docs, occasional book references).
+- **Try** — 1-2 stretch problems harder than the main exercise. Self-graded; no reference solutions in `solutions/`. The point is to push past the spec.
+
+The scaffolder's `README.md.tmpl` pre-stocks both subheadings.
+
+### Imports
+
+Phase 1 stays on the standard library only. The root `go.mod`'s `require` block stays empty through all of Phase 1. Third-party dependencies enter Phase 2 onward, and only when a lesson teaches them.
+
+### Reference
+
+- [Course design](docs/superpowers/specs/2026-05-05-go-course-design.md)
+- [Phase 1 design (Plan C spec)](docs/superpowers/specs/2026-05-07-plan-c-phase-1-foundations-design.md)
 
 ## Local workflow
 

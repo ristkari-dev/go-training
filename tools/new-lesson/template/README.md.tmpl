@@ -12,20 +12,30 @@
 
 ## Concepts
 
-TODO — write the prose narrative that mirrors the slides for self-study readers.
+TODO — write the prose narrative that mirrors the slides for self-study readers. For Phase 1 lessons this should be several paragraphs per concept, not a recap.
 
-## Exercise
+## Exercise: warm-up
 
-Open `exercises/`. There is starter code that compiles plus failing tests in `*_test.go`. Make the tests pass.
+TODO — short description of the warm-up exercise (5-10 minutes). Open `exercises/warmup.go` and `exercises/warmup_test.go`. Make the failing tests pass.
+
+## Exercise: main
+
+TODO — description of the main exercise (30-45 minutes). Open `exercises/main.go` and `exercises/main_test.go`. Make the failing tests pass.
 
 ## How to run
 
 ```bash
 cd lessons/{{.Name}}/exercises
-go test ./...
-go run .
+go test -run Warmup -v   # warm-up only
+go test -v                # everything
 ```
 
 ## Going further
 
-- TODO — links, deeper exercises, std-lib reading for advanced students.
+### Read
+
+- TODO — 1-3 short links (Go blog posts, std-lib docs, occasional book references).
+
+### Try
+
+- TODO — 1-2 stretch problems harder than the main exercise. Self-graded. There are no reference solutions in `solutions/` — the point is to push past the spec.

@@ -60,8 +60,12 @@ func TestScaffoldCreatesExpectedTree(t *testing.T) {
 		"01-hello/slides/index.html",
 		"01-hello/slides/slides.md",
 		"01-hello/slides/assets/.gitkeep",
+		"01-hello/exercises/warmup.go",
+		"01-hello/exercises/warmup_test.go",
 		"01-hello/exercises/main.go",
 		"01-hello/exercises/main_test.go",
+		"01-hello/solutions/warmup.go",
+		"01-hello/solutions/warmup_test.go",
 		"01-hello/solutions/main.go",
 		"01-hello/solutions/main_test.go",
 	}
@@ -85,6 +89,15 @@ func TestScaffoldSubstitutesLessonInfo(t *testing.T) {
 	for _, want := range []string{"Lesson 05", "Slices And Maps", "lessons/05-slices-and-maps/exercises"} {
 		if !strings.Contains(string(readme), want) {
 			t.Errorf("README missing %q\n---\n%s", want, readme)
+		}
+	}
+	slides, err := os.ReadFile(filepath.Join(dest, "05-slices-and-maps", "slides", "slides.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{"Lesson 05", "Slices And Maps", "lessons/05-slices-and-maps/exercises"} {
+		if !strings.Contains(string(slides), want) {
+			t.Errorf("slides.md missing %q\n---\n%s", want, slides)
 		}
 	}
 }
