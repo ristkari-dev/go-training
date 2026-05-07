@@ -91,6 +91,15 @@ func TestScaffoldSubstitutesLessonInfo(t *testing.T) {
 			t.Errorf("README missing %q\n---\n%s", want, readme)
 		}
 	}
+	slides, err := os.ReadFile(filepath.Join(dest, "05-slices-and-maps", "slides", "slides.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{"Lesson 05", "Slices And Maps", "lessons/05-slices-and-maps/exercises"} {
+		if !strings.Contains(string(slides), want) {
+			t.Errorf("slides.md missing %q\n---\n%s", want, slides)
+		}
+	}
 }
 
 func TestScaffoldRefusesExistingDest(t *testing.T) {

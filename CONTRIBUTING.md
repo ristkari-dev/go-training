@@ -15,7 +15,7 @@ markers — fill them in.
 Every lesson has exactly these four parts:
 
 1. **`README.md`** — self-study notes that mirror the deck narrative.
-   Sections: Learning goals, Prerequisites, Concepts, Exercise, How to run,
+   Sections: Learning goals, Prerequisites, Concepts, Exercise: warm-up, Exercise: main, How to run,
    Going further.
 2. **`slides/`** — the live-lecture deck. `index.html` is reveal.js bootstrap;
    `slides.md` is the markdown content. Use `Note:` blocks for speaker notes.
@@ -80,6 +80,15 @@ Slide prose is self-readable. Use `Note:` blocks for live-lecture-only commentar
 ### When students start writing tests
 
 Through lessons 1-3, exercises ship pre-written failing tests that students don't author themselves — they just edit the `.go` files until the tests pass. From **lesson 4 onward**, students write some test code themselves.
+
+### Going further
+
+Each lesson's README ends with a `## Going further` section split into two parts:
+
+- **Read** — 1-3 short links (Go blog posts, std-lib docs, occasional book references).
+- **Try** — 1-2 stretch problems harder than the main exercise. Self-graded; no reference solutions in `solutions/`. The point is to push past the spec.
+
+The scaffolder's `README.md.tmpl` pre-stocks both subheadings.
 
 ### Imports
 
