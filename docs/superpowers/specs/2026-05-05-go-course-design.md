@@ -22,9 +22,9 @@ A Go programming course delivered as both a code repository and per-lesson revea
 - Solutions ship in the same lesson folder under `solutions/`, committed to `main`. Students can peek if stuck.
 - Testing is woven through every lesson from lesson 4 onward.
 
-## Curriculum (28 lessons, four phases)
+## Curriculum (29 lessons, four phases)
 
-### Phase 1 — Foundations (lessons 1-7)
+### Phase 1 — Foundations (lessons 1-8)
 
 1. **Hello, Go** — install, `go run`, `go mod init`, `main`, packages, `fmt`. Print + read input.
 2. **Variables, types, operators** — primitives, zero values, type inference, conversions, constants, `iota`.
@@ -33,41 +33,42 @@ A Go programming course delivered as both a code repository and per-lesson revea
 5. **Composite types I — arrays, slices, maps** — slice internals (len/cap), `append`, `range`, map idioms.
 6. **Composite types II — structs & methods** — value vs pointer receivers, struct embedding basics.
 7. **Packages & modules** — splitting code, exported vs unexported, `go.mod`, imports, std-lib tour. Tooling thread starts: `gofmt`, `go vet`.
+8. **Phase 1 capstone — expense tracker CLI** — integrating multiple packages, `cmd/` convention, using a provided package as a black-box dependency.
 
-### Phase 2 — Idiomatic Go (lessons 8-14)
+### Phase 2 — Idiomatic Go (lessons 9-15)
 
-8. **Pointers, value vs reference semantics** — when to use pointers, escape-analysis intuition (no internals).
-9. **Interfaces** — implicit satisfaction, small interfaces, `io.Reader`/`io.Writer`, `any`, type assertions.
-10. **Errors** — sentinel, wrapping (`errors.Is`/`As`), custom error types, error design.
-11. **Generics** — type parameters, constraints, when *not* to use generics.
-12. **Encoding & I/O** — JSON, files, readers/writers, `bufio`, streaming patterns.
-13. **Time, strings, bytes, regex** — practical std-lib literacy.
-14. **Idiomatic project structure & testing patterns** — `cmd/`, `internal/`, table tests, subtests, `t.Helper`, golden files.
+9. **Pointers, value vs reference semantics** — when to use pointers, escape-analysis intuition (no internals).
+10. **Interfaces** — implicit satisfaction, small interfaces, `io.Reader`/`io.Writer`, `any`, type assertions.
+11. **Errors** — sentinel, wrapping (`errors.Is`/`As`), custom error types, error design.
+12. **Generics** — type parameters, constraints, when *not* to use generics.
+13. **Encoding & I/O** — JSON, files, readers/writers, `bufio`, streaming patterns.
+14. **Time, strings, bytes, regex** — practical std-lib literacy.
+15. **Idiomatic project structure & testing patterns** — `cmd/`, `internal/`, table tests, subtests, `t.Helper`, golden files.
 
-### Phase 3 — Concurrency & Systems (lessons 15-21)
+### Phase 3 — Concurrency & Systems (lessons 16-22)
 
-15. **Goroutines & channels — the basics** — `go`, unbuffered/buffered channels, `range` over channel, `close`.
-16. **Select & timers** — `select`, `time.After`, ticker, default branch, cancellation patterns.
-17. **`sync` & memory model** — `Mutex`, `RWMutex`, `WaitGroup`, `Once`, atomics, race detector.
-18. **`context`** — propagation, cancellation, deadlines, common mistakes.
-19. **Concurrency patterns** — worker pool, fan-in/out, pipelines, `errgroup`.
-20. **Networking & syscalls** — `net`, TCP/UDP basics, signals, file descriptors, syscall awareness.
-21. **Profiling, benchmarking, fuzzing** — `go test -bench`, pprof, escape analysis, fuzz tests.
+16. **Goroutines & channels — the basics** — `go`, unbuffered/buffered channels, `range` over channel, `close`.
+17. **Select & timers** — `select`, `time.After`, ticker, default branch, cancellation patterns.
+18. **`sync` & memory model** — `Mutex`, `RWMutex`, `WaitGroup`, `Once`, atomics, race detector.
+19. **`context`** — propagation, cancellation, deadlines, common mistakes.
+20. **Concurrency patterns** — worker pool, fan-in/out, pipelines, `errgroup`.
+21. **Networking & syscalls** — `net`, TCP/UDP basics, signals, file descriptors, syscall awareness.
+22. **Profiling, benchmarking, fuzzing** — `go test -bench`, pprof, escape analysis, fuzz tests.
 
-### Phase 4 — Production & Distributed (lessons 22-28)
+### Phase 4 — Production & Distributed (lessons 23-29)
 
-22. **HTTP servers** — `net/http`, routing, handlers, middleware, structured logging (`slog`).
-23. **HTTP clients & resilience** — timeouts, retries, circuit-breaker concept, context propagation.
-24. **gRPC** — protobuf, server/client, streaming, interceptors.
-25. **Configuration, secrets, graceful shutdown** — flags, env, config files, signal handling.
-26. **Build, release, containerization** — build tags, cross-compile, multi-stage Dockerfile, distroless.
-27. **Observability** — metrics, traces (OpenTelemetry), structured logs, health checks.
-28. **Distributed patterns & wrap-up** — message queues, idempotency, deployment to a managed runtime, course capstone.
+23. **HTTP servers** — `net/http`, routing, handlers, middleware, structured logging (`slog`).
+24. **HTTP clients & resilience** — timeouts, retries, circuit-breaker concept, context propagation.
+25. **gRPC** — protobuf, server/client, streaming, interceptors.
+26. **Configuration, secrets, graceful shutdown** — flags, env, config files, signal handling.
+27. **Build, release, containerization** — build tags, cross-compile, multi-stage Dockerfile, distroless.
+28. **Observability** — metrics, traces (OpenTelemetry), structured logs, health checks.
+29. **Distributed patterns & wrap-up** — message queues, idempotency, deployment to a managed runtime, course capstone.
 
 ### Cross-cutting threads
 
 - **Testing** — every lesson from lesson 4 onward ships failing tests for students to make pass.
-- **Tooling** — `go vet`, `gofmt`, `goimports`, `staticcheck`, `golangci-lint` introduced lesson 7 and reinforced in CI.
+- **Tooling** — `go vet`, `gofmt`, `goimports`, `staticcheck`, `golangci-lint` introduced lesson 7 and reinforced in CI. (Lesson references in later phases will use the renumbered values: e.g., lesson 20 introduces `errgroup`.)
 - **"Going further"** — every lesson README has a section with optional advanced exercises, std-lib reading, and external links for stronger students.
 
 ## Repository layout
@@ -285,7 +286,7 @@ The single canonical entry point. Self-documenting via `make help`:
 
 - Go version pinned in `go.mod` and matched in CI + Dockerfile.
 - Reveal.js vendored at a pinned version under `shared/reveal/`. Upgrades are explicit, reviewable commits.
-- Third-party Go deps avoided in early/middle lessons. Introduced deliberately and only when a lesson teaches them (e.g., `golang.org/x/sync/errgroup` in lesson 19, gRPC packages in lesson 24).
+- Third-party Go deps avoided in early/middle lessons. Introduced deliberately and only when a lesson teaches them (e.g., `golang.org/x/sync/errgroup` in lesson 20, gRPC packages in lesson 25).
 
 ### Documentation in the repo
 
