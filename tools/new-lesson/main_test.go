@@ -60,8 +60,12 @@ func TestScaffoldCreatesExpectedTree(t *testing.T) {
 		"01-hello/slides/index.html",
 		"01-hello/slides/slides.md",
 		"01-hello/slides/assets/.gitkeep",
+		"01-hello/exercises/warmup.go",
+		"01-hello/exercises/warmup_test.go",
 		"01-hello/exercises/main.go",
 		"01-hello/exercises/main_test.go",
+		"01-hello/solutions/warmup.go",
+		"01-hello/solutions/warmup_test.go",
 		"01-hello/solutions/main.go",
 		"01-hello/solutions/main_test.go",
 	}
