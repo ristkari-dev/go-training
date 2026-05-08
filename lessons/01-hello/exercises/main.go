@@ -20,9 +20,9 @@ func Greet(name string) string {
 //
 // Examples:
 //
-//	FormatExpense("2026-05-07", 4.50, "coffee")     => "2026-05-07  €4.50  coffee"
-//	FormatExpense("2026-05-07", 23.5, "groceries")  => "2026-05-07  €23.50  groceries"
-//	FormatExpense("2026-04-30", 1234.5, "rent")     => "2026-04-30  €1234.50  rent"
+//	FormatExpense("2026-05-07", 4.50, "coffee")     → "2026-05-07  €4.50  coffee"
+//	FormatExpense("2026-05-07", 23.5, "groceries")  → "2026-05-07  €23.50  groceries"
+//	FormatExpense("2026-04-30", 1234.5, "rent")     → "2026-04-30  €1234.50  rent"
 //
 // Hint: import "fmt" and use fmt.Sprintf with the format verb %.2f
 // to print the amount with two decimal places.

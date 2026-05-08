@@ -41,6 +41,38 @@ go run hello.go
 
 You'll see `Hello, Go!` printed. That's the smallest complete Go program — three required pieces: the package declaration on line 1, the `import "fmt"` to bring in the printing package, and `func main()` as the program's entry point.
 
+The course threads through a small running example — a personal expense tracker. By the end of Phase 1, you'll have built a working CLI for it. For now, just print a hello-world version with the theme:
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("Hello! You spent €23.50 on coffee today.")
+}
+```
+
+That `€23.50` is hardcoded as a string for now. Lesson 02 introduces variables and types so the `23.50` can be a real number you compute with.
+
+**Common mistake.** Forgetting `package main`:
+
+```go
+import "fmt"
+
+func main() {
+	fmt.Println("Hello!")
+}
+```
+
+Go complains:
+
+```
+hello.go:1:1: expected 'package', found 'import'
+```
+
+Every Go file starts with a `package` declaration. For executable programs, that line is exactly `package main`.
+
 ### Modules and the project structure
 
 A single `.go` file works for tiny demos, but real Go projects are organised as *modules*. A module is a directory with a `go.mod` file at the top. You create one with:
@@ -59,11 +91,33 @@ go 1.23
 
 `example.com/hello` is the module path — a logical identifier that other modules would use to import yours. `go 1.23` declares the minimum Go version. Inside a module, you can run `go run .` (the dot means "the current package") and Go figures out which files to compile. This is the standard way to run programs once a project has more than one file.
 
+**Common mistake.** Confusing the module path with the directory name. The module path (`example.com/hello`) is just an identifier — it tells Go's tooling how to refer to your module if it were imported by someone else. It does not have to match your directory name. The convention is to use a path you control on the internet — `github.com/yourusername/yourproject` is the most common form.
+
 ### The main package and main function
 
 Every executable Go program has the same entry point: `func main()` inside `package main`. The package name `main` is what tells Go this is a runnable program (rather than a library). The `main` function takes no parameters and returns nothing — its only job is to run when the program starts.
 
 If you write `package mainz` or `func Main()` (capital M), Go won't run the program. It'll either complain at compile time or report that no entry point exists. Case matters.
+
+**Common mistake.** Capitalisation matters. Go is case-sensitive everywhere:
+
+```go
+package main
+
+import "fmt"
+
+func Main() {  // wrong: capital M
+	fmt.Println("Hello!")
+}
+```
+
+Go complains:
+
+```
+runtime.main_main·f: function main is undeclared in the main package
+```
+
+The fix is one keystroke: `Main` → `main`.
 
 ### Formatting output with fmt
 
@@ -93,6 +147,21 @@ prints:
 
 `fmt.Sprintf` is the same as `Printf` but returns the formatted string instead of printing it. You'll use `Sprintf` in this lesson's main exercise.
 
+**Common mistake.** Forgetting the `\n` at the end of a `Printf`:
+
+```go
+fmt.Printf("Hello!")
+fmt.Printf("World!")
+```
+
+Output:
+
+```
+Hello!World!
+```
+
+No newlines, no separation. `Println` adds the newline; `Printf` does not. If you want the line to end, include `\n` in the format string.
+
 ## Exercise: warm-up
 
 Open `exercises/warmup.go`. There are two small functions to implement:
@@ -119,6 +188,8 @@ cd lessons/01-hello/exercises
 go test -run Warmup -v   # warm-up only
 go test -v                # everything
 ```
+
+After you finish (or while iterating), run `gofmt -w .` from the lesson folder to keep your code formatted in the canonical Go style. Make this a habit — every Go project does it the same way, and the tooling enforces it.
 
 Once both exercises pass, take a look at `solutions/` to compare your code with the reference implementation. The solutions might use slightly different idioms — that's fine.
 

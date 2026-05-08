@@ -254,6 +254,8 @@ Capitalisation matters. Go is case-sensitive everywhere:
 ```go
 package main
 
+import "fmt"
+
 func Main() {  // wrong: capital M
 	fmt.Println("Hello!")
 }
@@ -407,6 +409,7 @@ For live: walk through `go run hello.go` on the projector. Hit the common mistak
 - Executable programs are `package main` with `func main()`.
 - `fmt.Println` for simple printing; `fmt.Printf` for formatted output; `fmt.Sprintf` returns the formatted string.
 - Go is case-sensitive — `main` not `Main`.
+- Run `gofmt -w .` to reformat your code — make it a habit before every commit.
 
 ---
 
