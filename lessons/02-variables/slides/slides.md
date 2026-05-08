@@ -1,0 +1,190 @@
+## Lesson 02
+
+# Variables
+
+Learning goal: TODO
+
+---
+
+## What we'll cover
+
+- TODO
+- TODO
+- TODO
+
+---
+
+## Concept 1: TODO
+
+### Motivation
+
+TODO — why this concept exists, what problem it solves. One or two short paragraphs.
+
+---
+
+### The basics
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("TODO: minimal example introducing the concept")
+}
+```
+
+---
+
+### A worked example
+
+TODO — a substantive example using the concept in a realistic context.
+
+```go
+package main
+
+func main() {
+	// TODO
+}
+```
+
+---
+
+### Common mistake
+
+TODO — what NOT to do, with the bug the compiler/runtime would surface.
+
+```go
+// the wrong way
+```
+
+---
+
+### Recap
+
+- TODO
+- TODO
+
+---
+
+## Concept 2: TODO
+
+### Motivation
+
+TODO
+
+---
+
+### The basics
+
+```go
+// minimal
+```
+
+---
+
+### A worked example
+
+TODO
+
+```go
+// concrete
+```
+
+---
+
+### Common mistake
+
+TODO
+
+```go
+// wrong way
+```
+
+---
+
+### Recap
+
+- TODO
+
+---
+
+## Concept 3: TODO
+
+### Motivation
+
+TODO
+
+---
+
+### The basics
+
+```go
+// minimal
+```
+
+---
+
+### A worked example
+
+TODO
+
+```go
+// concrete
+```
+
+---
+
+### Common mistake
+
+TODO
+
+```go
+// wrong way
+```
+
+---
+
+### Recap
+
+- TODO
+
+---
+
+## Practice
+
+### Warm-up
+
+TODO — short description of the warm-up exercise. Files: `exercises/warmup.go`, `exercises/warmup_test.go`.
+
+```bash
+cd lessons/02-variables/exercises
+go test -run Warmup -v
+```
+
+---
+
+### Main
+
+TODO — description of the main exercise. Files: `exercises/main.go`, `exercises/main_test.go`.
+
+```bash
+cd lessons/02-variables/exercises
+go test -v
+```
+
+Note:
+Speaker notes for the live lecture go here. They render only in the speaker view (press `S`). Use `Note:` blocks throughout the deck to record what to actually say live; the slide prose is the self-study text.
+
+---
+
+## What we learned
+
+- TODO
+- TODO
+
+---
+
+## Up next
+
+Lesson NN — TODO
