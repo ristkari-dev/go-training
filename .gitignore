@@ -9,3 +9,6 @@
 # Editor
 .idea/
 .vscode/
+
+# Brainstorming companion
+.superpowers/
