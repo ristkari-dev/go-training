@@ -179,7 +179,7 @@ fmt.Println(asInt)   // 3, not 4
 Open `exercises/warmup.go`. Two functions to implement:
 
 - `WarmupZeroValues() (int, float64, string, bool)` — return the zero values of these four types. The simplest way is to declare four variables with `var` and return them.
-- `WarmupConvert(intVal int, floatVal float64) (float64, int)` — return `float64(intVal)` and `int(floatVal)` (the float-to-int conversion truncates toward zero).
+- `WarmupConvert(intVal int, floatVal float64) (asFloat float64, asInt int)` — return `float64(intVal)` and `int(floatVal)` (the float-to-int conversion truncates toward zero).
 
 The tests cover positive, zero, negative, and large values.
 

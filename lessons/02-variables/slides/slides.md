@@ -46,6 +46,18 @@ The three variable forms are equivalent in this example. `:=` is the most common
 
 `const` declares a value that the compiler refuses to let you change after the declaration.
 
+For sequential constants — like enum values — use `iota`, a counter that starts at 0 inside a `const ( ... )` block:
+
+```go
+const (
+	Cents = iota  // 0
+	Euros         // 1
+	Dollars       // 2
+)
+```
+
+Each line implicitly takes the previous line's expression, so listing names alone gives you 0, 1, 2.
+
 ---
 
 ### A worked example
@@ -101,6 +113,7 @@ At package level, you must use `var` (or `const`). Inside a function, both forms
 - Three variable forms: `var x int = 5` (explicit), `var x = 5` (inferred), `x := 5` (short).
 - `:=` only works inside functions.
 - `const` declares a compile-time-fixed value.
+- `iota` is a counter inside a `const ( … )` block; useful for enum-like sequences.
 
 ---
 
@@ -435,7 +448,7 @@ For live: walk through the integer-division gotcha on the projector (`7/2 = 3`, 
 - Basic types: `int`, `float64`, `string`, `bool`. Zero values: `0`, `0.0`, `""`, `false`.
 - Arithmetic: `+`, `-`, `*`, `/`, `%`. Integer division drops fractions — convert to float to get fractional results.
 - Conversions are explicit (`float64(x)`, `int(y)`); `int(float)` truncates toward zero.
-- `const` declares values that never change.
+- `const` declares values that never change; `iota` is a counter for sequences.
 - Run `gofmt -w .` to keep your code formatted.
 
 ---

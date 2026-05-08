@@ -17,6 +17,7 @@ func TestTotal(t *testing.T) {
 		{"three-expenses", 4.50, 12.00, 23.50, 40.0},
 		{"zero", 0, 0, 0, 0},
 		{"single-large", 1000.0, 0, 0, 1000.0},
+		{"negative-values", -5.0, -3.0, -2.0, -10.0},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -37,6 +38,7 @@ func TestAverage(t *testing.T) {
 		{"clean-divide", 10.0, 20.0, 30.0, 20.0},
 		{"zero", 0, 0, 0, 0},
 		{"three-expenses-avg", 4.50, 12.00, 23.50, 40.0 / 3.0},
+		{"negative-avg", -3.0, -6.0, -9.0, -6.0},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
