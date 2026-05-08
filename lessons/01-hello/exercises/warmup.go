@@ -13,8 +13,9 @@ func WarmupHello() string {
 // WarmupGreet returns "Hello, <name>!" for the given name.
 //
 // Examples:
-//   WarmupGreet("World") → "Hello, World!"
-//   WarmupGreet("Aki")   → "Hello, Aki!"
+//
+//	WarmupGreet("World") → "Hello, World!"
+//	WarmupGreet("Aki")   → "Hello, Aki!"
 //
 // Hint: Go strings concatenate with the + operator.
 func WarmupGreet(name string) string {
