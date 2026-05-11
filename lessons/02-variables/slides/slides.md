@@ -26,6 +26,12 @@ Variables hold values. We need a way to introduce a name, optionally give it a t
 
 ### The basics
 
+Variables hold values that can be declared in three forms. Constants declare values that never change. For sequential constants, `iota` provides an auto-incrementing counter inside a `const ( ... )` block.
+
+--
+
+### Code
+
 ```go
 package main
 
@@ -62,7 +68,11 @@ Each line implicitly takes the previous line's expression, so listing names alon
 
 ### A worked example
 
-The expense theme — declare an expense as three typed variables:
+The expense theme — declare an expense as three typed variables.
+
+--
+
+### Code
 
 ```go
 package main
@@ -84,7 +94,11 @@ Three short-form declarations, three different types (`string`, `float64`, `stri
 
 ### Common mistake
 
-Trying to use `:=` outside a function:
+Trying to use `:=` outside a function.
+
+--
+
+### Code (broken)
 
 ```go
 package main
@@ -127,6 +141,12 @@ Every variable in Go has a type. The type determines what values the variable ca
 
 ### The basics
 
+The four most common types are `int`, `float64`, `string`, and `bool`. Every variable starts at its type's zero value if you don't assign one.
+
+--
+
+### Code
+
 ```go
 package main
 
@@ -159,7 +179,11 @@ The four most common types you'll meet first:
 
 ### A worked example
 
-You can declare and assign in one go, or split them. Both produce the same final state:
+You can declare and assign in one go, or split them. Both produce the same final state.
+
+--
+
+### Code
 
 ```go
 package main
@@ -188,7 +212,11 @@ The split form is occasionally useful when the assignment depends on a condition
 
 ### Common mistake
 
-Assuming Go has `nil` for numeric types:
+Assuming Go has `nil` for numeric types.
+
+--
+
+### Code (broken)
 
 ```go
 var x int
@@ -225,6 +253,12 @@ You've seen variables. Now we want to compute new values from them. Arithmetic o
 
 ### The basics
 
+Go's five arithmetic operators cover addition, subtraction, multiplication, division, and remainder. Integer division drops the fractional part — convert to float when you need fractions.
+
+--
+
+### Code
+
 ```go
 package main
 
@@ -253,7 +287,11 @@ Note `a / b` is `3`, not `3.333…`. When both operands are integers, Go does *i
 
 ### A worked example
 
-The expense theme — compute a 14% tip:
+The expense theme — compute a 14% tip.
+
+--
+
+### Code
 
 ```go
 package main
@@ -287,7 +325,11 @@ Notice `%%` in the format string — that's how you print a literal `%` with `Pr
 
 ### Common mistake
 
-Integer division silently drops the fractional part:
+Integer division silently drops the fractional part.
+
+--
+
+### Code (broken)
 
 ```go
 package main
@@ -331,6 +373,12 @@ Go is strict about types. You can't add an `int` to a `float64`, or compare a `s
 
 ### The basics
 
+Type conversions are explicit in Go. Use `float64(x)` or `int(y)` to convert between numeric types — the compiler won't do it for you.
+
+--
+
+### Code
+
 ```go
 package main
 
@@ -355,7 +403,11 @@ func main() {
 
 ### A worked example
 
-The expense theme — say cents are stored as integers, but we want to display them as euros:
+The expense theme — say cents are stored as integers, but we want to display them as euros.
+
+--
+
+### Code
 
 ```go
 package main
@@ -381,7 +433,11 @@ Without the conversion, `amountCents / 100` would be integer division (`4`, not 
 
 ### Common mistake
 
-Truncation, not rounding, when converting float64 to int:
+Truncation, not rounding, when converting float64 to int.
+
+--
+
+### Code (broken)
 
 ```go
 package main

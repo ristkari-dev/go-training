@@ -28,7 +28,11 @@ For small programs you can think of `go run file.go` as "run this Go file" the s
 
 ### The basics
 
-Save this as `hello.go`:
+Save the following as `hello.go`, then run it with `go run hello.go`. You should see `Hello, Go!` printed — you just compiled and ran a Go program.
+
+--
+
+### Code
 
 ```go
 package main
@@ -40,25 +44,25 @@ func main() {
 }
 ```
 
-Then run:
-
 ```bash
 go run hello.go
 ```
 
-You should see:
+Output:
 
 ```
 Hello, Go!
 ```
 
-That's it. You just compiled and ran a Go program.
-
 ---
 
 ### A worked example
 
-Let's start the running theme of this course: a personal expense tracker. By the end of Phase 1, you'll have built a small CLI for it. For now, just print a hello-world version:
+Let's start the running theme of this course: a personal expense tracker. By the end of Phase 1, you'll have built a small CLI for it. For now, just print a hello-world version with a hardcoded amount — lesson 02 introduces variables and types so the `23.50` can be a number you compute with.
+
+--
+
+### Code
 
 ```go
 package main
@@ -70,13 +74,11 @@ func main() {
 }
 ```
 
-Run it:
-
 ```bash
 go run hello.go
 ```
 
-You'll see:
+Output:
 
 ```
 Hello! You spent €23.50 on coffee today.
@@ -88,7 +90,11 @@ That `€23.50` is hardcoded as a string for now. Lesson 02 introduces variables
 
 ### Common mistake
 
-A classic mistake: forgetting `package main`.
+A classic mistake: forgetting `package main`. Every Go file starts with a `package` declaration — for executable programs, that line is exactly `package main`.
+
+--
+
+### Code (broken)
 
 ```go
 import "fmt"
@@ -103,8 +109,6 @@ Run it and Go complains:
 ```
 hello.go:1:1: expected 'package', found 'import'
 ```
-
-Every Go file starts with a `package` declaration. For executable programs, that line is exactly `package main`.
 
 ---
 
@@ -128,7 +132,11 @@ For Phase 1, every lesson lives inside the course's single module. You'll create
 
 ### The basics
 
-Create a new directory and initialise a module:
+Create a new directory and initialise a module with `go mod init`. You'll get a `go.mod` file with a `module` line (the import path) and a `go` line (the minimum Go version) — that's all you need to start.
+
+--
+
+### Code
 
 ```bash
 mkdir hello-project
@@ -150,7 +158,11 @@ The `module` line is the *import path*. The `go` line is the minimum Go version.
 
 ### A worked example
 
-Add a `main.go` next to the `go.mod`:
+Add a `main.go` next to the `go.mod`, then run with `go run .` — the dot means "the current package". Go looks at all `.go` files in this directory, compiles them, and runs `main()`. That's the standard way to run programs from a module.
+
+--
+
+### Code
 
 ```go
 package main
@@ -161,8 +173,6 @@ func main() {
 	fmt.Println("Hello from a real module!")
 }
 ```
-
-Now you can run:
 
 ```bash
 go run .
@@ -203,6 +213,12 @@ This sounds simple, but the *combination* — special package name, special func
 
 ### The basics
 
+Two rules for executable programs: the package must be named `main`, and there must be exactly one function called `main` with no parameters and no return values. If either is missing, `go run` complains.
+
+--
+
+### Code
+
 ```go
 package main
 
@@ -222,7 +238,11 @@ If either is missing, `go run` complains.
 
 ### A worked example
 
-Let's add some variables (technically lesson 02 territory, but useful here as a preview):
+Let's add some variables (technically lesson 02 territory, but useful here as a preview) and see how `Println` handles multiple arguments — including a float that loses its trailing zero.
+
+--
+
+### Code
 
 ```go
 package main
@@ -249,7 +269,11 @@ Output:
 
 ### Common mistake
 
-Capitalisation matters. Go is case-sensitive everywhere:
+Capitalisation matters. Go is case-sensitive everywhere — `Main` with a capital M is not the entry point, and Go will tell you so at runtime.
+
+--
+
+### Code (broken)
 
 ```go
 package main
@@ -291,6 +315,12 @@ You'll print things constantly while learning a language: to inspect values, to 
 
 ### The basics
 
+The key difference: `Println` joins arguments with spaces and adds a newline automatically; `Printf` uses format verbs (`%s`, `%d`, `%.2f`) but does NOT add a newline — you write `\n` yourself.
+
+--
+
+### Code
+
 ```go
 package main
 
@@ -314,7 +344,11 @@ Three things to notice:
 
 ### A worked example
 
-The expense-tracker theme — print three expenses with two-decimal amounts:
+The expense-tracker theme — print three expenses with two-decimal amounts. The `%.2f` verb gives consistent formatting, including `4.50` (which would lose the trailing zero with `Println`).
+
+--
+
+### Code
 
 ```go
 package main
@@ -342,7 +376,11 @@ Every amount is printed with exactly two decimal places, including `4.50` (which
 
 ### Common mistake
 
-Forgetting the `\n` at the end of a `Printf`:
+Forgetting the `\n` at the end of a `Printf` call causes output to run together on the same line. `Println` adds the newline for you; `Printf` does not.
+
+--
+
+### Code (broken)
 
 ```go
 fmt.Printf("Hello!")

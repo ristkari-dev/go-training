@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="../../../shared/reveal/dist/reset.css">
   <link rel="stylesheet" href="../../../shared/reveal/dist/reveal.css">
   <link rel="stylesheet" href="../../../shared/reveal/theme/go-training.css">
-  <link rel="stylesheet" href="../../../shared/reveal/plugin/highlight/monokai.css">
+  <link rel="stylesheet" href="../../../shared/reveal/plugin/highlight/dracula.css">
 </head>
 <body>
   <div class="reveal">
@@ -27,6 +27,8 @@
     Reveal.initialize({
       hash: true,
       slideNumber: 'c/t',
+      transition: 'fade',
+      transitionSpeed: 'fast',
       plugins: [RevealMarkdown, RevealHighlight, RevealNotes, RevealSearch],
     });
   </script>

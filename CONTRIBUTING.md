@@ -77,6 +77,8 @@ The scaffolder's `slides.md.tmpl` pre-stocks three concept blocks following this
 
 Slide prose is self-readable. Use `Note:` blocks for live-lecture-only commentary.
 
+**Code goes "down."** When a sub-slide has both explanatory prose and a code block, split them into a vertical stack with `--`. The prose is the parent slide; the code is the child below it. Authors give each vertical step its own `###` sub-heading (e.g. `### Code`, `### Run it`, `### Output`). Students press Right to move between concepts; Down to drill into code. Reveal.js shows a navigation arrow at the bottom-right when there's more below — no need for an explicit "press Down" cue.
+
 ### When students start writing tests
 
 Through lessons 1-3, exercises ship pre-written failing tests that students don't author themselves — they just edit the `.go` files until the tests pass. From **lesson 4 onward**, students write some test code themselves.
