@@ -1,73 +1,234 @@
 /*
- * go-training: a reveal.js theme tuned for code-heavy slides.
- * Builds on reveal.js's CSS variables; override only what we need.
+ * go-training reveal.js theme — Go-themed dark
+ *
+ * Design tokens, type scale, slide-pattern classes, and reveal.js
+ * variable overrides. See docs/superpowers/specs/2026-05-08-theming-overhaul-design.md.
  */
 
+@import url("../dist/theme/fonts/source-sans-pro/source-sans-pro.css");
+
 :root {
-  --r-background-color: #1f2430;
-  --r-main-color: #f4f4f4;
-  --r-main-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* Background and surface */
+  --bg: #1d2541;
+  --surface: #252e4f;
+  --surface-2: #2c3658;
+  --border: rgba(154, 230, 180, 0.18);
+
+  /* Foreground */
+  --fg: #e8eef9;
+  --fg-muted: rgba(232, 238, 249, 0.65);
+  --fg-subtle: rgba(232, 238, 249, 0.45);
+
+  /* Accent (Go green) */
+  --accent: #9ae6b4;
+  --accent-soft: rgba(154, 230, 180, 0.10);
+  --accent-strong: rgba(154, 230, 180, 0.45);
+
+  /* Code (Dracula) */
+  --code-bg: #282a36;
+
+  /* Error (Common mistake error blocks) */
+  --error-accent: #ff79c6;
+  --error-bg: rgba(255, 121, 198, 0.10);
+
+  /* Fonts */
+  --font-sans: "Source Sans 3", "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Source Code Pro", "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+}
+
+/* Reveal.js variable overrides — these cascade into reveal.js's defaults */
+.reveal {
+  --r-background-color: var(--bg);
+  --r-main-color: var(--fg);
+  --r-main-font: var(--font-sans);
   --r-main-font-size: 38px;
-  --r-heading-color: #5dc9e2;
-  --r-heading-font: var(--r-main-font);
+  --r-heading-color: var(--fg);
+  --r-heading-font: var(--font-sans);
   --r-heading-text-shadow: none;
   --r-heading-text-transform: none;
   --r-heading1-size: 2.2em;
-  --r-heading2-size: 1.6em;
-  --r-heading3-size: 1.2em;
-  --r-link-color: #5dc9e2;
-  --r-link-color-hover: #ffffff;
-  --r-selection-color: #1f2430;
-  --r-selection-background-color: #5dc9e2;
-  --r-code-font: "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --r-heading2-size: 1.4em;
+  --r-heading3-size: 1.0em;
+  --r-link-color: var(--accent);
+  --r-link-color-hover: var(--fg);
+  --r-selection-color: var(--bg);
+  --r-selection-background-color: var(--accent);
+  --r-code-font: var(--font-mono);
+
+  background-color: var(--bg);
+  color: var(--fg);
 }
 
-.reveal {
-  background-color: var(--r-background-color);
-  color: var(--r-main-color);
+/* Headings */
+.reveal h1 {
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin-bottom: 0.4em;
 }
-
-.reveal h1, .reveal h2, .reveal h3, .reveal h4 {
-  color: var(--r-heading-color);
+.reveal h2 {
+  font-weight: 600;
   letter-spacing: -0.01em;
+  line-height: 1.15;
+  margin-bottom: 0.5em;
+}
+.reveal h3 {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  color: var(--accent);
+  margin-bottom: 0.6em;
+}
+.reveal h4 {
+  font-weight: 600;
+  letter-spacing: -0.005em;
 }
 
+/* Body text */
+.reveal p {
+  color: rgba(232, 238, 249, 0.85);
+  line-height: 1.55;
+}
+
+/* Inline code */
+.reveal code {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 0.05em 0.4em;
+  border-radius: 3px;
+  font-size: 0.95em;
+}
+
+/* Code blocks */
 .reveal pre {
   width: 100%;
-  font-size: 0.7em;
+  font-size: 0.55em;
   box-shadow: none;
-  border-radius: 6px;
+  border-radius: 8px;
+  background: var(--code-bg);
+  padding: 0;
+  margin: 0.5em 0;
 }
-
 .reveal pre code {
   padding: 1em 1.2em;
-  max-height: 600px;
-  line-height: 1.4;
-  font-family: var(--r-code-font);
+  max-height: 75vh;
+  overflow: auto;
+  line-height: 1.55;
+  background: transparent;
+  color: #f8f8f2;
+  font-family: var(--font-mono);
+  font-size: inherit;
+  border-radius: 8px;
+  /* highlight.js dracula.css supplies token colors */
 }
 
-.reveal code {
-  font-family: var(--r-code-font);
-  background: rgba(255, 255, 255, 0.08);
-  padding: 0.05em 0.3em;
-  border-radius: 3px;
+/* Lists */
+.reveal ul {
+  display: block;
+  margin-left: 0;
+  padding-left: 0;
+  list-style: none;
+}
+.reveal ul li {
+  position: relative;
+  padding-left: 1.25em;
+  margin: 0.35em 0;
+  color: rgba(232, 238, 249, 0.88);
+}
+.reveal ul li::before {
+  content: "";
+  position: absolute;
+  left: 0.3em;
+  top: 0.6em;
+  width: 0.35em;
+  height: 0.35em;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.reveal ol {
+  color: rgba(232, 238, 249, 0.88);
+}
+.reveal ol li::marker {
+  color: var(--accent);
+  font-weight: 600;
 }
 
+/* Blockquote — used as the default callout */
+.reveal blockquote {
+  background: var(--accent-soft);
+  border-left: 4px solid var(--accent);
+  padding: 0.6em 1em;
+  border-radius: 0 8px 8px 0;
+  font-style: normal;
+  width: 100%;
+  box-shadow: none;
+}
+
+/* Images */
 .reveal section img {
   border: none;
   background: transparent;
   box-shadow: none;
 }
 
-.reveal blockquote {
-  background: rgba(255, 255, 255, 0.05);
-  border-left: 4px solid var(--r-heading-color);
-  padding: 0.5em 1em;
-  font-style: normal;
+/* Slide number indicator */
+.reveal .slide-number {
+  font-family: var(--font-mono);
+  background: transparent;
+  color: var(--fg-subtle);
+  font-size: 0.6em;
 }
 
-.reveal .slide-number {
-  font-family: var(--r-code-font);
+/* Progress bar */
+.reveal .progress {
+  color: var(--accent);
+}
+
+/* Navigation arrows */
+.reveal .controls {
+  color: var(--accent);
+}
+
+/* Title-slide lesson label — e.g. "LESSON 01 · PHASE 1 — FOUNDATIONS" */
+.reveal .lesson-label {
+  font-family: var(--font-mono);
+  font-size: 0.6em;
+  color: var(--accent);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 0.6em;
+}
+
+/* Callout — boxed accent block (Learning goal, Note: blocks) */
+.reveal .callout {
+  background: var(--accent-soft);
+  border-left: 4px solid var(--accent);
+  padding: 0.8em 1.2em;
+  border-radius: 0 8px 8px 0;
+  margin: 0.6em 0;
+}
+.reveal .callout h3 {
+  margin-bottom: 0.3em;
+}
+
+/* Error block — pink-accent code-styled block for compiler errors / unexpected output */
+.reveal .error-block,
+.reveal pre.error-block {
+  font-family: var(--font-mono);
+  background: var(--error-bg);
+  color: #f8f8f2;
+  border-left: 4px solid var(--error-accent);
+  padding: 0.7em 1em;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.55em;
+  line-height: 1.55;
+  margin: 0.4em 0;
+}
+.reveal .error-block code {
   background: transparent;
-  color: rgba(255, 255, 255, 0.4);
+  color: inherit;
+  padding: 0;
 }
