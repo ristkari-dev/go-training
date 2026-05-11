@@ -5,6 +5,28 @@
  * variable overrides. See docs/superpowers/specs/2026-05-08-theming-overhaul-design.md.
  */
 
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/inter/Inter-Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../fonts/inter/Inter-SemiBold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../fonts/inter/Inter-Bold.woff2") format("woff2");
+}
+
 @import url("../dist/theme/fonts/source-sans-pro/source-sans-pro.css");
 
 :root {
@@ -32,7 +54,7 @@
   --error-bg: rgba(255, 121, 198, 0.10);
 
   /* Fonts */
-  --font-sans: "Source Sans 3", "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Inter", "Source Sans 3", "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: "Source Code Pro", "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
 }
 
@@ -232,3 +254,29 @@
   color: inherit;
   padding: 0;
 }
+
+/* ----- Slide alignment overrides ----- */
+/* Reveal.js defaults to text-align: center on every slide section. For */
+/* code-heavy content this looks wrong: code lines render centered, and  */
+/* bulleted lists keep their bullets at the far left while text floats   */
+/* in the middle. Override to left-align everything.                     */
+
+.reveal .slides {
+  text-align: left;
+}
+.reveal .slides section,
+.reveal .slides section > section {
+  text-align: left;
+}
+
+/* Code blocks should always render left-aligned, regardless of inherited */
+/* alignment. (Belt-and-braces — also covered by the .reveal .slides     */
+/* section rule above, but explicit is better here.)                     */
+.reveal pre,
+.reveal pre code {
+  text-align: left;
+}
+
+/* Title slide elements stay left-aligned too (per user choice). The     */
+/* h1 and lesson-label scale large but anchor to the left margin like   */
+/* every other slide.                                                   */
