@@ -29,5 +29,5 @@ func Greet(name string) string {
 // Hint: import "fmt" and use fmt.Sprintf with the format verb %.2f
 // to print the amount with two decimal places.
 func FormatExpense(date string, amount float64, category string) string {
-	return(fmt.Sprintf("TODO: implement FormatExpense (see hint in the doc comment)"))
+	return (fmt.Sprintf("TODO: implement FormatExpense (see hint in the doc comment)"))
 }
