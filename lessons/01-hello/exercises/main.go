@@ -5,6 +5,8 @@
 // tests in main_test.go pass.
 package exercises
 
+import "fmt"
+
 // Greet returns a greeting like "Hello, World!".
 //
 // Provided as a worked example of a function that takes a string,
@@ -27,5 +29,5 @@ func Greet(name string) string {
 // Hint: import "fmt" and use fmt.Sprintf with the format verb %.2f
 // to print the amount with two decimal places.
 func FormatExpense(date string, amount float64, category string) string {
-	panic("TODO: implement FormatExpense (see hint in the doc comment)")
+	return (fmt.Sprintf("TODO: implement FormatExpense (see hint in the doc comment)"))
 }
