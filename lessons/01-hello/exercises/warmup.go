@@ -7,7 +7,7 @@ package exercises
 
 // WarmupHello returns the greeting "Hello, Go!".
 func WarmupHello() string {
-	panic("TODO: return the string \"Hello, Go!\"")
+	return("TODO: return the string \"Hello, Go!\"")
 }
 
 // WarmupGreet returns "Hello, <name>!" for the given name.
@@ -19,5 +19,5 @@ func WarmupHello() string {
 //
 // Hint: Go strings concatenate with the + operator.
 func WarmupGreet(name string) string {
-	panic("TODO: return \"Hello, \" + name + \"!\"")
+	return("TODO: return \"Hello, \" + name + \"!\"")
 }
