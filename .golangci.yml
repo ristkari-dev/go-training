@@ -16,6 +16,15 @@ linters:
       - path: lessons/.*/(exercises|solutions)/
         linters:
           - errcheck
+      # Exercise files are intentionally incomplete: they ship stub functions
+      # (panic("TODO")) and unexported demo helpers (e.g. runMain) that
+      # students implement or call from their own scratch code. These
+      # routinely trip staticcheck (SA4006/SA4008/etc.) and `unused` until
+      # the student wires them up — that's the point of the exercise.
+      - path: lessons/.*/exercises/
+        linters:
+          - staticcheck
+          - unused
 
 formatters:
   enable:
