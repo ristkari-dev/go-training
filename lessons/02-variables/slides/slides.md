@@ -1,8 +1,17 @@
-## Lesson 02
-
-# Variables, types, operators
-
-Learning goal: declare typed variables in Go's three forms, recognise basic types and their zero values, do arithmetic with operators, and convert between numeric types.
+<div class="title-slide-grid">
+<div class="lesson-badge">
+<div class="lesson-number">02</div>
+<div class="lesson-word">Lesson</div>
+</div>
+<div class="title-slide-body">
+<div class="lesson-label">Phase 1 — Foundations</div>
+<h1>Variables, types, operators</h1>
+<div class="callout">
+<h3>Learning goal</h3>
+<p>Declare typed variables in Go's three forms, recognise basic types and their zero values, do arithmetic with operators, and convert between numeric types.</p>
+</div>
+</div>
+</div>
 
 ---
 

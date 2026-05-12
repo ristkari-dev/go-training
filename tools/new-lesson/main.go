@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"text/template"
 )
@@ -19,10 +20,39 @@ import (
 var templateFS embed.FS
 
 type lessonInfo struct {
-	Number string
-	Slug   string
+	Number    string
+	Slug      string
+	Name      string
+	Title     string
+	Phase     int
+	PhaseName string
+}
+
+// phaseRange maps a contiguous block of lesson numbers to its phase.
+// Mirrors the master list in tools/build-index/main.go.
+var phaseRanges = []struct {
+	Number int
+	Start  int
+	End    int
 	Name   string
-	Title  string
+}{
+	{Number: 1, Start: 1, End: 8, Name: "Foundations"},
+	{Number: 2, Start: 9, End: 15, Name: "Idiomatic Go"},
+	{Number: 3, Start: 16, End: 22, Name: "Concurrency & Systems"},
+	{Number: 4, Start: 23, End: 29, Name: "Production & Distributed"},
+}
+
+func phaseFor(numberStr string) (int, string, error) {
+	n, err := strconv.Atoi(numberStr)
+	if err != nil {
+		return 0, "", fmt.Errorf("invalid lesson number %q: %w", numberStr, err)
+	}
+	for _, p := range phaseRanges {
+		if n >= p.Start && n <= p.End {
+			return p.Number, p.Name, nil
+		}
+	}
+	return 0, "", fmt.Errorf("lesson number %d does not belong to any phase (1-29)", n)
 }
 
 var nameRe = regexp.MustCompile(`^(\d{2})-([a-z][a-z0-9]*(?:-[a-z0-9]+)*)$`)
@@ -32,11 +62,17 @@ func parseName(name string) (lessonInfo, error) {
 	if m == nil {
 		return lessonInfo{}, fmt.Errorf("invalid lesson name %q: must match NN-kebab-case, e.g. 01-hello", name)
 	}
+	phase, phaseName, err := phaseFor(m[1])
+	if err != nil {
+		return lessonInfo{}, err
+	}
 	return lessonInfo{
-		Number: m[1],
-		Slug:   m[2],
-		Name:   name,
-		Title:  toTitle(m[2]),
+		Number:    m[1],
+		Slug:      m[2],
+		Name:      name,
+		Title:     toTitle(m[2]),
+		Phase:     phase,
+		PhaseName: phaseName,
 	}, nil
 }
 

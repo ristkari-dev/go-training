@@ -1,8 +1,17 @@
-## Lesson 01
-
-# Hello, Go
-
-Learning goal: get a Go program running on your machine, understand `package main` and `func main()`, and use `fmt.Println` / `fmt.Printf` to print formatted output.
+<div class="title-slide-grid">
+<div class="lesson-badge">
+<div class="lesson-number">01</div>
+<div class="lesson-word">Lesson</div>
+</div>
+<div class="title-slide-body">
+<div class="lesson-label">Phase 1 — Foundations</div>
+<h1>Hello, Go</h1>
+<div class="callout">
+<h3>Learning goal</h3>
+<p>Get a Go program running on your machine, understand <code>package main</code> and <code>func main()</code>, and use <code>fmt.Println</code> / <code>fmt.Printf</code> to print formatted output.</p>
+</div>
+</div>
+</div>
 
 ---
 
