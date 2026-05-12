@@ -1,7 +1,5 @@
-// Package solutions is the reference implementation for lesson 03: Control flow.
-//
-// This file holds the warm-up reference solution.
-package solutions
+// This file holds the warm-up reference solution for lesson 03: Control flow.
+package main
 
 import "strconv"
 
