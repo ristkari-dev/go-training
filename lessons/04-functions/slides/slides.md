@@ -89,7 +89,7 @@ Three things:
 
 ### A worked example
 
-The expense theme — `MinMax(xs ...int) (int, int, error)` from your warm-up exercise:
+The expense theme — `WarmupMinMax(xs ...int) (int, int, error)` from your warm-up exercise:
 
 ```go
 package main
@@ -99,9 +99,9 @@ import (
 	"fmt"
 )
 
-var errEmpty = errors.New("MinMax: requires at least one value")
+var errEmpty = errors.New("WarmupMinMax: requires at least one value")
 
-func MinMax(xs ...int) (int, int, error) {
+func WarmupMinMax(xs ...int) (int, int, error) {
 	if len(xs) == 0 {
 		return 0, 0, errEmpty
 	}
@@ -118,7 +118,7 @@ func MinMax(xs ...int) (int, int, error) {
 }
 
 func main() {
-	lo, hi, err := MinMax(3, 1, 4, 1, 5, 9, 2, 6)
+	lo, hi, err := WarmupMinMax(3, 1, 4, 1, 5, 9, 2, 6)
 	if err != nil {
 		fmt.Println("error:", err)
 		return
@@ -291,9 +291,9 @@ import (
 )
 
 // Sentinel error declared as a package-level var.
-var errEmpty = errors.New("MinMax: requires at least one value")
+var errEmpty = errors.New("WarmupMinMax: requires at least one value")
 
-func MinMax(xs ...int) (int, int, error) {
+func WarmupMinMax(xs ...int) (int, int, error) {
 	if len(xs) == 0 {
 		return 0, 0, errEmpty
 	}
@@ -302,7 +302,7 @@ func MinMax(xs ...int) (int, int, error) {
 }
 
 func main() {
-	lo, hi, err := MinMax()
+	lo, hi, err := WarmupMinMax()
 	if err != nil {
 		fmt.Println("error:", err)
 		return
@@ -314,7 +314,7 @@ func main() {
 Output:
 
 ```
-error: MinMax: requires at least one value
+error: WarmupMinMax: requires at least one value
 ```
 
 Two patterns to learn here:
@@ -528,8 +528,8 @@ result.DoSomething()
 
 In `exercises/warmup.go`:
 
-- `Add(a, b int) int` — the simplest function in the course. Return `a + b`.
-- `MinMax(xs ...int) (int, int, error)` — variadic input, multi-return, error for empty input. Return `(0, 0, errEmptyMinMax)` when `len(xs) == 0`; otherwise return the smallest, the largest, and `nil`.
+- `WarmupAdd(a, b int) int` — the simplest function in the course. Return `a + b`.
+- `WarmupMinMax(xs ...int) (int, int, error)` — variadic input, multi-return, error for empty input. Return `(0, 0, errEmptyWarmupMinMax)` when `len(xs) == 0`; otherwise return the smallest, the largest, and `nil`.
 
 Tests are pre-written.
 

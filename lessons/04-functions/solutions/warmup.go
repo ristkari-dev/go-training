@@ -5,19 +5,19 @@ package solutions
 
 import "errors"
 
-// errEmptyMinMax is returned by MinMax when called with no values.
-var errEmptyMinMax = errors.New("MinMax: requires at least one value")
+// errEmptyWarmupMinMax is returned by WarmupMinMax when called with no values.
+var errEmptyWarmupMinMax = errors.New("WarmupMinMax: requires at least one value")
 
-// Add returns the sum of two ints.
-func Add(a, b int) int {
+// WarmupAdd returns the sum of two ints.
+func WarmupAdd(a, b int) int {
 	return a + b
 }
 
-// MinMax returns the smallest and largest of the given ints, plus an error
-// for the empty-input case.
-func MinMax(xs ...int) (int, int, error) {
+// WarmupMinMax returns the smallest and largest of the given ints, plus an
+// error for the empty-input case.
+func WarmupMinMax(xs ...int) (int, int, error) {
 	if len(xs) == 0 {
-		return 0, 0, errEmptyMinMax
+		return 0, 0, errEmptyWarmupMinMax
 	}
 	min, max := xs[0], xs[0]
 	for _, v := range xs[1:] {

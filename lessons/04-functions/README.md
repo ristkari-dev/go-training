@@ -155,7 +155,7 @@ func main() {
 
 Two patterns to internalise:
 
-- **`errors.New("message")`** — the simplest way to make an error. Stash recurring ones in package-level `var`s as "sentinels" (e.g. `var errDivByZero = errors.New(...)`) — that lets callers compare or check via `errors.Is` (lesson 11 covers `errors.Is` formally; for now, `==` works on sentinels).
+- **`errors.New("message")`** — the simplest way to make an error. Stash recurring ones in package-level `var`s as "sentinels" (e.g. `var errDivByZero = errors.New(...)`). Compare using `errors.Is(err, sentinelVar)` — your warm-up test uses this shape. (`errors.Is` is plain equality for unwrapped sentinels today; lesson 11 explains why it's the future-proof spelling once errors get wrapped.)
 - **`if err != nil { return ..., err }`** — *the* canonical guard. You'll write it thousands of times.
 
 `error` itself is a built-in type with one method: `Error() string`. (What makes that work is interfaces — lesson 10.)
@@ -240,8 +240,8 @@ Fix: `t.Fatalf` when continuing would crash.
 
 Open `exercises/warmup.go`. Two functions:
 
-- `Add(a, b int) int` — return `a + b`.
-- `MinMax(xs ...int) (int, int, error)` — return the smallest and largest, plus `nil`. For empty input, return `(0, 0, errEmptyMinMax)` (the sentinel is already declared at the top of the file).
+- `WarmupAdd(a, b int) int` — return `a + b`.
+- `WarmupMinMax(xs ...int) (int, int, error)` — return the smallest and largest, plus `nil`. For empty input, return `(0, 0, errEmptyWarmupMinMax)` (the sentinel is already declared at the top of the file).
 
 Tests are pre-written. Implement until they pass.
 

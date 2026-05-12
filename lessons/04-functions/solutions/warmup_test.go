@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestAdd(t *testing.T) {
+func TestWarmupAdd(t *testing.T) {
 	cases := []struct {
 		name string
 		a, b int
@@ -18,14 +18,14 @@ func TestAdd(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			if got := Add(tc.a, tc.b); got != tc.want {
-				t.Errorf("Add(%d, %d) = %d, want %d", tc.a, tc.b, got, tc.want)
+			if got := WarmupAdd(tc.a, tc.b); got != tc.want {
+				t.Errorf("WarmupAdd(%d, %d) = %d, want %d", tc.a, tc.b, got, tc.want)
 			}
 		})
 	}
 }
 
-func TestMinMax(t *testing.T) {
+func TestWarmupMinMax(t *testing.T) {
 	cases := []struct {
 		name             string
 		xs               []int
@@ -42,24 +42,24 @@ func TestMinMax(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			gotMin, gotMax, err := MinMax(tc.xs...)
+			gotMin, gotMax, err := WarmupMinMax(tc.xs...)
 			if tc.wantErr {
 				if err == nil {
-					t.Fatalf("MinMax(%v) returned nil error, want non-nil", tc.xs)
+					t.Fatalf("WarmupMinMax(%v) returned nil error, want non-nil", tc.xs)
 				}
-				if !errors.Is(err, errEmptyMinMax) {
-					t.Errorf("MinMax(%v) error = %v, want errEmptyMinMax", tc.xs, err)
+				if !errors.Is(err, errEmptyWarmupMinMax) {
+					t.Errorf("WarmupMinMax(%v) error = %v, want errEmptyWarmupMinMax", tc.xs, err)
 				}
 				return
 			}
 			if err != nil {
-				t.Fatalf("MinMax(%v) unexpected error: %v", tc.xs, err)
+				t.Fatalf("WarmupMinMax(%v) unexpected error: %v", tc.xs, err)
 			}
 			if gotMin != tc.wantMin {
-				t.Errorf("MinMax(%v) min = %d, want %d", tc.xs, gotMin, tc.wantMin)
+				t.Errorf("WarmupMinMax(%v) min = %d, want %d", tc.xs, gotMin, tc.wantMin)
 			}
 			if gotMax != tc.wantMax {
-				t.Errorf("MinMax(%v) max = %d, want %d", tc.xs, gotMax, tc.wantMax)
+				t.Errorf("WarmupMinMax(%v) max = %d, want %d", tc.xs, gotMax, tc.wantMax)
 			}
 		})
 	}
