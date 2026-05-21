@@ -9,6 +9,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -162,14 +163,7 @@ func cmdSummary(s store.Store, w io.Writer) error {
 	for k := range totals {
 		keys = append(keys, k)
 	}
-	// Sort via the strings convention.
-	for i := 0; i < len(keys); i++ {
-		for j := i + 1; j < len(keys); j++ {
-			if keys[i] > keys[j] {
-				keys[i], keys[j] = keys[j], keys[i]
-			}
-		}
-	}
+	sort.Strings(keys)
 
 	fmt.Fprintln(w, "by category:")
 	for _, k := range keys {

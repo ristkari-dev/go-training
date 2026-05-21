@@ -276,7 +276,7 @@ go run ./lessons/15-structure/solutions/warmup
 - **Add a golden file test for `cmd/expenses list`.** Pattern is the same as `summary`: seed a MemoryStore, call cmdList capturing into bytes.Buffer, AssertGolden. Decide whether listing with zero entries should produce an empty golden (just newlines) or skip the test.
 - **Benchmark `csvimport.Parse` on a 100k-line input.** Generate the input with `strings.Repeat`. Compare ns/op with various line counts to see if Parse scales linearly.
 - **Run the fuzzer for an hour.** `go test -fuzz=FuzzParseLine -fuzztime=1h ./internal/csvimport/`. If you find a crash, file an issue describing the offending input. (Likely outcome: no crash — parseLine has good defensive checks.)
-- **Move the warmup's `main.go` up one directory** (to `exercises/`) and re-run `go build ./...`. Observe the compile error. Then move it back. This is the demo Phase 2 spec described.
+- **Trigger the internal/ compile error firsthand.** Copy `warmup/internal/util/format.go` to a temp location, then write a tiny `.go` file in a SIBLING lesson (e.g., `lessons/14-time-strings-regex/`) that imports `github.com/ristkari-dev/go-training/lessons/15-structure/solutions/warmup/internal/util`. `go build` fails with `use of internal package … not allowed`. The internal/ rule cares about being outside the **parent of the internal/ directory** — moving `main.go` within `warmup/` or even within `lessons/15-structure/` still works because both are descendants of `warmup/`'s parent.
 
 ---
 
