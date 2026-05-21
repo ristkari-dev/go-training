@@ -34,6 +34,5 @@ import "cmp"
 //  3. for _, x := range xs[1:] → if x > m → m = x
 //  4. return m, nil
 func Max[T cmp.Ordered](xs []T) (T, error) {
-	_ = cmp.Less[int]
 	panic("TODO: handle empty, then linear scan; return largest element")
 }

@@ -184,7 +184,7 @@ Implement `Max[T cmp.Ordered](xs []T) (T, error)` in `exercises/warmup/maxg/maxg
 
 ## Exercise: main — `slicesx`
 
-Implement `Filter[T any]` and `Map[T, U any]` in `exercises/slicesx/slicesx.go`. Both pre-allocate their output slices (Filter with `cap(0, len(xs))`; Map with exact `len(xs)`). Tests cover element filtering on `[]int` and `[]string`, plus `Map` from `int→string`, `string→string`, and `string→int`.
+Implement `Filter[T any]` and `Map[T, U any]` in `exercises/slicesx/slicesx.go`. Both pre-allocate their output slices: Filter with `make([]T, 0, len(xs))` (zero length, capacity `len(xs)` — worst case zero re-allocs); Map with `make([]U, len(xs))` (exact size known). Tests cover element filtering on `[]int` and `[]string`, plus `Map` from `int→string`, `string→string`, and `string→int`.
 
 **Time:** 15-25 minutes.
 
