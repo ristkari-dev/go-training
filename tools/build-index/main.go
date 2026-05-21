@@ -50,7 +50,7 @@ var allLessons = []lessonInfo{
 	{Number: "11", Slug: "errors", Title: "Errors", Blurb: "wrapping · errors.Is/As", Phase: 2},
 	{Number: "12", Slug: "generics", Title: "Generics", Blurb: "type parameters", Phase: 2},
 	{Number: "13", Slug: "encoding-io", Title: "Encoding & I/O", Blurb: "JSON · bufio · streams", Phase: 2},
-	{Number: "14", Slug: "stdlib", Title: "Time, strings, regex", Blurb: "stdlib literacy", Phase: 2},
+	{Number: "14", Slug: "time-strings-regex", Title: "Time, strings, regex", Blurb: "stdlib literacy", Phase: 2},
 	{Number: "15", Slug: "structure", Title: "Project structure", Blurb: "cmd/ · internal/", Phase: 2},
 	// Phase 3 — Concurrency & Systems
 	{Number: "16", Slug: "goroutines", Title: "Goroutines & channels", Blurb: "go · chan · range", Phase: 3},
