@@ -117,7 +117,11 @@ func TestWalkAllFilesTimedOut(t *testing.T) {
 	writeFile(t, dir, "a.log", "2026-05-21T14:30:00 INFO a\n")
 	writeFile(t, dir, "b.log", "2026-05-21T14:31:00 WARN b\n")
 
-	result, err := Walk(dir, 1*time.Nanosecond)
+	// 1µs (not 1ns) gives ~1000× headroom over scheduler/race overhead.
+	// 1ns mostly works, but under -race instrumentation (5-20× overhead)
+	// a worker can occasionally finish before the timer's first iteration.
+	// A microsecond is still effectively instant for this test's purpose.
+	result, err := Walk(dir, 1*time.Microsecond)
 	if err != nil {
 		t.Fatalf("timeouts should not error: %v", err)
 	}

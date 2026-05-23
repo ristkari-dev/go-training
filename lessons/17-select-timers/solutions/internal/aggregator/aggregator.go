@@ -64,6 +64,9 @@ func Walk(dir string, timeout time.Duration) (WalkResult, error) {
 		case r := <-resultsCh:
 			delete(pending, r.path)
 			if r.err != nil {
+				// Early return on real error. The buffered resultsCh (sized
+				// len(files)) absorbs any in-flight workers' sends, so no
+				// goroutine leaks even though we stop reading.
 				return result, fmt.Errorf("aggregator: %s: %w", r.path, r.err)
 			}
 			for level, count := range r.counts {
