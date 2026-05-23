@@ -57,6 +57,13 @@ func TestWalk(t *testing.T) {
 	})
 
 	t.Run("malformed-line-returns-error", func(t *testing.T) {
+		// Note: goroutine results arrive in non-deterministic order. The
+		// reduce loop in Walk returns on the FIRST error it encounters
+		// in the result stream — which goroutine that is can vary run to
+		// run. This test is safe because only bad.log produces an error;
+		// whichever file Walk processes first, it will eventually hit
+		// bad.log and return an error mentioning it. If you ever add a
+		// second error-producing file, this assertion may flake.
 		dir := t.TempDir()
 		writeFile(t, dir, "good.log", "2026-05-21T14:30:00 INFO ok\n")
 		writeFile(t, dir, "bad.log", "garbage not a log line\n")

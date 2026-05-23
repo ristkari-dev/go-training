@@ -57,6 +57,13 @@ func TestAggregatorGoldenPath(t *testing.T) {
 }
 
 func TestAggregatorMalformed(t *testing.T) {
+	// Note: same non-determinism caveat as aggregator_test.go's
+	// malformed-line-returns-error sub-test. The binary exits 1 on the
+	// first error Walk returns; with two concurrent goroutines, that
+	// could be any of them. Safe here because only bad.log errors —
+	// whichever file Walk reads from the channel first, it eventually
+	// hits bad.log. Adding a second error-producing file would make
+	// the stderr substring assertion flake.
 	bin := buildBinary(t)
 	logDir := t.TempDir()
 	writeFile(t, logDir, "good.log", "2026-05-21T14:30:00 INFO ok\n")
