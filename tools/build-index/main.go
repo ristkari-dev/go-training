@@ -55,7 +55,7 @@ var allLessons = []lessonInfo{
 	// Phase 3 — Concurrency & Systems
 	{Number: "16", Slug: "goroutines-channels", Title: "Goroutines & channels", Blurb: "go · chan · range", Phase: 3},
 	{Number: "17", Slug: "select-timers", Title: "Select & timers", Blurb: "select · time.After", Phase: 3},
-	{Number: "18", Slug: "sync", Title: "sync & memory model", Blurb: "Mutex · race detector", Phase: 3},
+	{Number: "18", Slug: "sync-memory-model", Title: "sync & memory model", Blurb: "Mutex · race detector", Phase: 3},
 	{Number: "19", Slug: "context", Title: "context", Blurb: "cancellation · deadlines", Phase: 3},
 	{Number: "20", Slug: "patterns", Title: "Concurrency patterns", Blurb: "worker pool · errgroup", Phase: 3},
 	{Number: "21", Slug: "networking", Title: "Networking", Blurb: "net · TCP · syscalls", Phase: 3},
