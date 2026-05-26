@@ -26,6 +26,15 @@ type WalkResult struct {
 
 // Walk is the channel-based aggregator with ctx propagation.
 func Walk(ctx context.Context, dir string, timeout time.Duration) (WalkResult, error) {
+	// Canonical upfront ctx check. Without this, a pre-cancelled ctx
+	// races with the workers' first results in the reduce loop's
+	// select — both cases are ready, runtime picks randomly. The
+	// upfront check guarantees we never spawn workers for an already-
+	// cancelled call.
+	if err := ctx.Err(); err != nil {
+		return WalkResult{}, err
+	}
+
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return WalkResult{}, fmt.Errorf("aggregator: read dir %s: %w", dir, err)
@@ -82,6 +91,15 @@ func Walk(ctx context.Context, dir string, timeout time.Duration) (WalkResult, e
 
 // WalkLocked is the mutex-based aggregator with ctx propagation.
 func WalkLocked(ctx context.Context, dir string, timeout time.Duration) (WalkResult, error) {
+	// Symmetry with Walk: canonical upfront ctx check. Even though
+	// WalkLocked's structure means each worker would self-skip the
+	// merge on cancel and wg.Wait + ctx.Err priority would handle it,
+	// the upfront check saves spawning N goroutines for an already-
+	// cancelled call.
+	if err := ctx.Err(); err != nil {
+		return WalkResult{}, err
+	}
+
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return WalkResult{}, fmt.Errorf("aggregator: read dir %s: %w", dir, err)
