@@ -132,12 +132,13 @@ func TestAggregatorTimeout(t *testing.T) {
 	writeFile(t, logDir, "a.log", "2026-05-21T14:30:00 INFO a\n")
 	writeFile(t, logDir, "b.log", "2026-05-21T14:31:00 WARN b\n")
 
-	// 1ms (not 1ns) gives subprocess-level headroom. Even though the
-	// timer fires nearly instantly, file I/O + subprocess startup
-	// under -race can take hundreds of microseconds. 1ms is still
-	// effectively instant from a human perspective but reliably
-	// shorter than the file work — every file appears in TimedOut.
-	cmd := exec.Command(bin, "-dir="+logDir, "-timeout=1ms")
+	// 1ns reliably triggers the timeout BEFORE file work completes.
+	// Counterintuitive but empirically verified: the timer fires at
+	// the first scheduler tick (microseconds), still well before
+	// tmpfs file reads + parsing (~100µs+). Tested through L17 and
+	// L18 under -race on multiple machines. Larger timeouts (≥1ms)
+	// actually let the file work complete and break the assertion.
+	cmd := exec.Command(bin, "-dir="+logDir, "-timeout=1ns")
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
