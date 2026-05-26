@@ -112,9 +112,15 @@ func runWalkSuite(t *testing.T, fn walkFunc) {
 		writeFile(t, dir, "a.log", "2026-05-21T14:30:00 INFO a\n")
 		writeFile(t, dir, "b.log", "2026-05-21T14:31:00 WARN b\n")
 
-		// 1µs (not 1ns) gives ~1000× headroom over scheduler/race
-		// overhead — see L17 plan for rationale.
-		result, err := fn(dir, 1*time.Microsecond)
+		// 1ms (not 1ns or 1µs) gives robust headroom. The bottleneck
+		// differs between Walk and WalkLocked:
+		//   - Walk: time.After fires per-iteration of the main reduce
+		//     loop; 1µs reliably beats Go scheduler latency.
+		//   - WalkLocked: time.After fires per-worker; the inner goroutine
+		//     does file I/O which on tmpfs can complete in ~hundreds of
+		//     ns and under -race can race the 1µs timer.
+		// 1ms is safe for both styles and still effectively instant.
+		result, err := fn(dir, 1*time.Millisecond)
 		if err != nil {
 			t.Fatalf("timeouts should not error: %v", err)
 		}
