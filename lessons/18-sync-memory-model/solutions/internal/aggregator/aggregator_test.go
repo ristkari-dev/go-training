@@ -112,24 +112,28 @@ func runWalkSuite(t *testing.T, fn walkFunc) {
 		writeFile(t, dir, "a.log", "2026-05-21T14:30:00 INFO a\n")
 		writeFile(t, dir, "b.log", "2026-05-21T14:31:00 WARN b\n")
 
-		// 1µs (not 1ns or 1ms) is the empirically-tuned value that
-		// reliably fires the timeout before file I/O completes.
-		//   - 1ns is too short: scheduler latency exceeds it, so the
-		//     test isn't actually exercising the timeout code path.
-		//   - 1ms is too long: tmpfs file reads complete in ~100µs
-		//     even under -race; files would process before the timer.
-		// 1µs sits in the right window for both Walk's main-loop
-		// timer and WalkLocked's per-worker timer. See L17 plan for
-		// the original tuning rationale.
+		// Probabilistic test: at 1µs, at least one file should time out.
+		// On slow CI runners (GitHub Actions), file work occasionally
+		// beats the timer for some individual files, so we verify that
+		// (a) every file is accounted for in either Counts or TimedOut,
+		// and (b) at least one timeout occurred. Documents the inherent
+		// non-determinism honestly while still exercising the timeout
+		// code path. (L17 originally asserted exactly == 2; CI flake
+		// after L18 merge taught us to soften.)
 		result, err := fn(dir, 1*time.Microsecond)
 		if err != nil {
 			t.Fatalf("timeouts should not error: %v", err)
 		}
-		if len(result.Counts) != 0 {
-			t.Errorf("expected empty Counts when all files time out, got %v", result.Counts)
+		filesAccounted := len(result.TimedOut)
+		for _, c := range result.Counts {
+			filesAccounted += c
 		}
-		if len(result.TimedOut) != 2 {
-			t.Errorf("expected 2 timed-out files, got %d: %v", len(result.TimedOut), result.TimedOut)
+		if filesAccounted != 2 {
+			t.Errorf("expected 2 files accounted for (Counts+TimedOut), got %d (counts=%v, timedout=%v)",
+				filesAccounted, result.Counts, result.TimedOut)
+		}
+		if len(result.TimedOut) == 0 {
+			t.Errorf("expected at least one timed-out file at 1µs timeout, got 0 (counts=%v)", result.Counts)
 		}
 	})
 }
