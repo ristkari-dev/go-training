@@ -68,6 +68,12 @@ func Walk(ctx context.Context, dir string, timeout time.Duration) (WalkResult, e
 		}
 		select {
 		case r := <-resultsCh:
+			// A file might arrive AFTER the timeout case already marked
+			// it as timed out — skip the merge so we never count a file
+			// in BOTH Counts and TimedOut. (Same race fix as L17/L18.)
+			if _, stillPending := pending[r.path]; !stillPending {
+				continue
+			}
 			delete(pending, r.path)
 			if r.err != nil {
 				return result, fmt.Errorf("aggregator: %s: %w", r.path, r.err)

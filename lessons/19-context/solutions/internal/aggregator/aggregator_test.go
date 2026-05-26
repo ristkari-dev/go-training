@@ -111,16 +111,23 @@ func runWalkSuite(t *testing.T, fn walkFunc) {
 		writeFile(t, dir, "a.log", "2026-05-21T14:30:00 INFO a\n")
 		writeFile(t, dir, "b.log", "2026-05-21T14:31:00 WARN b\n")
 
-		// 1µs per L17/L18 empirical rationale.
+		// Invariant test (matches L17/L18 post-CI-fix shape): every file
+		// accounted for in EXACTLY one of Counts or TimedOut. Don't
+		// assert how many timed out — slow CI runners may produce zero
+		// timeouts (workers beat the timer), fast machines under -race
+		// may produce all timeouts. Both are valid; only the invariant
+		// matters.
 		result, err := fn(context.Background(), dir, 1*time.Microsecond)
 		if err != nil {
 			t.Fatalf("timeouts should not error: %v", err)
 		}
-		if len(result.Counts) != 0 {
-			t.Errorf("expected empty Counts when all files time out, got %v", result.Counts)
+		filesAccounted := len(result.TimedOut)
+		for _, c := range result.Counts {
+			filesAccounted += c
 		}
-		if len(result.TimedOut) != 2 {
-			t.Errorf("expected 2 timed-out files, got %d: %v", len(result.TimedOut), result.TimedOut)
+		if filesAccounted != 2 {
+			t.Errorf("expected 2 files accounted for (Counts+TimedOut), got %d (counts=%v, timedout=%v)",
+				filesAccounted, result.Counts, result.TimedOut)
 		}
 	})
 
