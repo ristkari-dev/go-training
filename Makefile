@@ -13,6 +13,12 @@ test: ## Run tests, excluding the intentionally-failing exercise tests
 	if [ -z "$$pkgs" ]; then echo "no testable packages"; exit 0; fi; \
 	go test $$pkgs
 
+.PHONY: test-race
+test-race: ## Run tests with the race detector (excludes exercises; 5-20x slower)
+	@pkgs=$$(go list ./... | grep -v '/exercises$$'); \
+	if [ -z "$$pkgs" ]; then echo "no testable packages"; exit 0; fi; \
+	go test -race $$pkgs
+
 .PHONY: test-exercises
 test-exercises: ## Run exercise tests (these fail by design until students complete them)
 	-@pkgs=$$(go list ./... | grep '/exercises$$'); \
