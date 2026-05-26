@@ -62,6 +62,14 @@ func Walk(dir string, timeout time.Duration) (WalkResult, error) {
 
 		select {
 		case r := <-resultsCh:
+			// A file might arrive AFTER the timeout case already marked
+			// it as timed out (the file's goroutine doesn't know it was
+			// "given up on" — it still completes and sends here). Skip
+			// the merge if this file is no longer pending, so we never
+			// count a file in BOTH Counts and TimedOut.
+			if _, stillPending := pending[r.path]; !stillPending {
+				continue
+			}
 			delete(pending, r.path)
 			if r.err != nil {
 				// Early return on real error. The buffered resultsCh (sized
