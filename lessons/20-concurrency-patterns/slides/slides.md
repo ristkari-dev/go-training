@@ -489,9 +489,6 @@ for range workers {
                 return fmt.Errorf("aggregator: %s: %w", r.path, r.err)
             }
             resultsCh <- r
-            if ctx.Err() != nil {
-                return ctx.Err()
-            }
         }
         return nil
     })
