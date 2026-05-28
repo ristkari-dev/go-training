@@ -149,8 +149,12 @@ func runWalkSuite(t *testing.T, fn walkFunc) {
 		writeFile(t, dir, "a.log", "2026-05-21T14:30:00 INFO a\n")
 		writeFile(t, dir, "b.log", "2026-05-21T14:31:00 WARN b\n")
 
-		// Tight deadline — workers can't finish before it expires.
-		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Microsecond)
+		// Deadline already in the past → the walk's upfront ctx.Err()
+		// check returns DeadlineExceeded deterministically, with no race
+		// against worker completion. A 1µs timeout could lose that race
+		// on a slow/loaded CI runner and let the walk finish first
+		// (returning nil) — a real flake observed on GitHub Actions.
+		ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(-time.Hour))
 		defer cancel()
 
 		_, err := fn(ctx, dir, 0)
