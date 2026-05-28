@@ -59,7 +59,7 @@ var allLessons = []lessonInfo{
 	{Number: "19", Slug: "context", Title: "context", Blurb: "cancellation · deadlines", Phase: 3},
 	{Number: "20", Slug: "concurrency-patterns", Title: "Concurrency patterns", Blurb: "worker pool · errgroup", Phase: 3},
 	{Number: "21", Slug: "networking", Title: "Networking", Blurb: "net · TCP · syscalls", Phase: 3},
-	{Number: "22", Slug: "profiling", Title: "Profiling & benchmarks", Blurb: "pprof · go test -bench", Phase: 3},
+	{Number: "22", Slug: "profiling-fuzz", Title: "Profiling & fuzzing", Blurb: "pprof · bench · fuzz", Phase: 3},
 	// Phase 4 — Production & Distributed
 	{Number: "23", Slug: "http-server", Title: "HTTP servers", Blurb: "net/http · slog", Phase: 4},
 	{Number: "24", Slug: "http-client", Title: "HTTP clients", Blurb: "retries · timeouts", Phase: 4},
