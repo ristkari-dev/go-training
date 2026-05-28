@@ -73,6 +73,9 @@ func FuzzParseLineFast(f *testing.F) {
 		"2026-01-02T15:04:05 ",
 		"2026-01-02T15:04:05 INFO ",
 		"2026-01-02T15:04:05 INFO  ",
+		"2026-01-02T15:04:05\rINFO msg",      // \r (a \s char) as the ts/level separator
+		"2026-01-02T15:04:05 INFO\fmsg",      // \f as the level/message separator
+		"2026-01-02T15:04:05 INFO msg\rmore", // \r internal to the message
 	}
 	for _, s := range seeds {
 		f.Add(s)

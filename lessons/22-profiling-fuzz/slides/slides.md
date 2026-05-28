@@ -239,16 +239,19 @@ go tool pprof -alloc_space heap.prof    # TOTAL bytes allocated over time (cumul
 go tool pprof -inuse_space heap.prof    # bytes LIVE right now (snapshot)
 ```
 
-**Escape analysis** explains why a value lands on the heap. Ask the compiler:
+**Escape analysis** explains why a value lands on the heap. Ask the compiler (line numbers will vary):
 
 ```bash
-go build -gcflags=-m ./internal/logparse/ 2>&1 | grep escapes
+go build -gcflags=-m ./internal/logparse/ 2>&1 | grep 'escapes to heap'
 ```
 ```
-./logparse.go:45:30: m escapes to heap
+./logparse.go:52:32: ... argument does not escape
+./logparse.go:52:32: &errors.errorString{...} escapes to heap   # the error we return
 ```
 
 A value "escapes" when the compiler can't prove it stays within the function — e.g. it's returned, stored in an interface, or captured by a closure that outlives the call. Escaped values are heap-allocated; non-escaping ones live on the stack (free).
+
+Note what `-gcflags=-m` does *not* show: the regex's `[]string` allocation happens *inside* the `regexp` package, not in our code, so it never appears in our file's `-m` output. You see that cost in the **heap profile** (`-memprofile`), not escape analysis. Escape analysis explains *your* allocations; the heap profile catches *everyone's*.
 
 ---
 

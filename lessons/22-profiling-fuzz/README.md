@@ -107,7 +107,7 @@ go tool pprof -inuse_space heap.prof    # bytes LIVE now (leaks)
 go build -gcflags=-m ./internal/logparse/ 2>&1 | grep escapes
 ```
 
-A value **escapes to the heap** when the compiler can't prove it stays within the function (returned, stored in an interface, captured by an outliving closure). Non-escaping values live on the stack — free.
+A value **escapes to the heap** when the compiler can't prove it stays within the function (returned, stored in an interface, captured by an outliving closure). Non-escaping values live on the stack — free. `-gcflags=-m` reports escapes in *your* code (line numbers vary); it won't show allocations inside imported packages — for those you read the heap profile.
 
 Why does the regex parser allocate 2× per call and the fast one 0×?
 
@@ -117,7 +117,7 @@ m := logLineRE.FindStringSubmatch(s)   // allocates a []string every call → 2 
 level := rest[:sp]                     // string slice: shares backing array → 0 allocs
 ```
 
-`s[i:j]` on a string returns a header into the *same* bytes — no copy, no allocation. `FindStringSubmatch` must materialize a slice. That's the 128 B / 2 allocs the benchmark measured, gone.
+`s[i:j]` on a string returns a header into the *same* bytes — no copy, no allocation. `FindStringSubmatch` must materialize a `[]string` (inside the `regexp` package, so the heap profile — not `-gcflags=-m` of our file — is where you see it). That's the 128 B / 2 allocs the benchmark measured, gone.
 
 ### Common mistake
 
