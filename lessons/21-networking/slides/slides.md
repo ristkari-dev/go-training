@@ -174,9 +174,11 @@ go func() {
     }
 }()
 
-// Send stdin lines:
+// Send stdin lines (buffered write, flush per line):
+w := bufio.NewWriter(conn)
 for stdin.Scan() {
-    fmt.Fprintln(conn, stdin.Text())
+    fmt.Fprintln(w, stdin.Text())
+    w.Flush()
 }
 
 // Half-close: signal EOF on our send side; keep receive side open.

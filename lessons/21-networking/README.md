@@ -82,8 +82,10 @@ go func() {
     for r.Scan() { fmt.Println(r.Text()) }
 }()
 
+w := bufio.NewWriter(conn)
 for stdin.Scan() {
-    fmt.Fprintln(conn, stdin.Text())
+    fmt.Fprintln(w, stdin.Text())
+    w.Flush()
 }
 
 // Half-close: send-side FIN, keep receive side open.
