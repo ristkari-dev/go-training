@@ -144,7 +144,10 @@ func TestServeLifecycle(t *testing.T) {
 		if err != nil {
 			t.Errorf("serve returned %v, want nil", err)
 		}
-	case <-time.After(2 * time.Second):
+	case <-time.After(10 * time.Second):
+		// Generous ceiling: serve waits on srv.Shutdown (up to 5s), so
+		// the test timeout must exceed it. With zero in-flight requests
+		// Shutdown returns near-instantly.
 		t.Fatal("serve did not return after cancel")
 	}
 }

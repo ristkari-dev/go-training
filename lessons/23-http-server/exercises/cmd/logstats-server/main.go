@@ -55,7 +55,6 @@ type statsResponse struct {
 func newRouter(store *logstats.Store, logger *slog.Logger) http.Handler {
 	_ = store
 	_ = logger
-	_ = logparse.ParseLine
 	panic("TODO: build mux with POST /ingest, GET /stats, GET /healthz; wrap in middleware")
 }
 
@@ -66,6 +65,7 @@ func newRouter(store *logstats.Store, logger *slog.Logger) http.Handler {
 func ingestHandler(store *logstats.Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		_ = maxIngestBytes
+		_ = logparse.ParseLine
 		panic("TODO: decode (MaxBytesReader), ParseLine each, store.Merge, writeJSON breakdown")
 	}
 }
@@ -110,6 +110,11 @@ func withRequestLog(next http.Handler, logger *slog.Logger) http.Handler {
 
 func withRecovery(next http.Handler, logger *slog.Logger) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// This yields a clean 500 only if the handler hasn't written a
+		// response yet — once WriteHeader is called the status is
+		// committed and can't be changed. Our handlers do all fallible
+		// work (decode, parse) BEFORE writing, so a panic lands here
+		// before any bytes go out.
 		defer func() {
 			if v := recover(); v != nil {
 				logger.Error("panic recovered", "value", v, "path", r.URL.Path)
@@ -133,8 +138,14 @@ func serve(ctx context.Context, ln net.Listener, stdout io.Writer) error {
 	store := logstats.NewStore()
 	srv := &http.Server{Handler: newRouter(store, logger)}
 
+	// Tie the shutdown goroutine to serve's lifetime: serveCancel on
+	// return guarantees it exits even if Serve fails for a reason other
+	// than our own Shutdown (otherwise it would block on <-ctx.Done()
+	// for the parent context's whole lifetime — a goroutine leak).
+	serveCtx, serveCancel := context.WithCancel(ctx)
+	defer serveCancel()
 	go func() {
-		<-ctx.Done()
+		<-serveCtx.Done()
 		shutCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		_ = srv.Shutdown(shutCtx)
