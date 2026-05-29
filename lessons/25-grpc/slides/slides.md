@@ -48,7 +48,7 @@ A REST+JSON API's "contract" lives in documentation and hope: the server and cli
 ```proto
 syntax = "proto3";
 package logstats.v1;
-option go_package = "github.com/ristkari-dev/go-training/lessons/25-grpc/solutions/proto/logstatspb";
+option go_package = ".../lessons/25-grpc/<tree>/proto/logstatspb"; // <tree> = exercises | solutions
 
 service LogStats {
   rpc Ingest(stream LogLine) returns (IngestSummary);   // client-streaming
