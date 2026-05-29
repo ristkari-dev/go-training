@@ -39,10 +39,11 @@ type Breaker struct {
 	cooldown    time.Duration
 	now         func() time.Time
 
-	mu       sync.Mutex
-	state    State
-	failures int
-	openedAt time.Time
+	mu               sync.Mutex
+	state            State
+	failures         int
+	openedAt         time.Time
+	halfOpenInFlight bool // a trial call is currently being attempted
 }
 
 // Option configures a Breaker.
@@ -77,15 +78,19 @@ func (b *Breaker) Call(fn func() error) error {
 	panic("TODO: if !allow() return ErrOpen; err := fn(); record(err); return err")
 }
 
-// allow reports whether a call may proceed, transitioning Open →
-// HalfOpen when the cooldown has elapsed (allowing one trial).
+// allow reports whether a call may proceed. It transitions Open →
+// HalfOpen when the cooldown has elapsed and admits exactly ONE trial
+// (set halfOpenInFlight=true); while that trial is in flight (state is
+// HalfOpen), further callers are denied — a recovering dependency gets
+// a single probe, not a fresh stampede.
 func (b *Breaker) allow() bool {
-	panic("TODO: lock; if Open and now-openedAt >= cooldown → HalfOpen, allow one trial; Open → deny; else allow")
+	panic("TODO: lock; Open+cooldown-elapsed → HalfOpen + halfOpenInFlight=true, admit the one trial; Open → deny; HalfOpen → deny (trial in flight); Closed → admit")
 }
 
-// record updates state from a call's outcome.
+// record updates state from a call's outcome. It clears
+// halfOpenInFlight (the trial, if any, has completed).
 func (b *Breaker) record(err error) {
-	panic("TODO: lock; on error → failures++, open if HalfOpen or failures>=max (stamp openedAt); on success → reset to Closed")
+	panic("TODO: lock; halfOpenInFlight=false; on error → failures++, open if HalfOpen or failures>=max (stamp openedAt); on success → reset to Closed")
 }
 
 // State returns the current state (mainly for tests/introspection).

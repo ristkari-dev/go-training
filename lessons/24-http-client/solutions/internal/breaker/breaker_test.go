@@ -80,3 +80,20 @@ func TestBreakerStillOpenBeforeCooldown(t *testing.T) {
 		t.Errorf("call before cooldown = %v, want ErrOpen", err)
 	}
 }
+
+func TestBreakerHalfOpenAdmitsOnlyOneTrial(t *testing.T) {
+	clk := &fakeClock{t: time.Unix(0, 0)}
+	b := New(1, time.Minute, WithClock(clk.now))
+	b.Call(func() error { return errors.New("boom") }) // opens
+	clk.add(time.Minute)                               // cooldown elapses
+
+	// First allow() transitions to half-open and admits the trial.
+	if !b.allow() {
+		t.Fatal("first allow after cooldown = false, want true (the trial)")
+	}
+	// A concurrent caller arriving before the trial's record() must be
+	// denied — only one probe is allowed in half-open.
+	if b.allow() {
+		t.Error("second allow during in-flight trial = true, want false")
+	}
+}

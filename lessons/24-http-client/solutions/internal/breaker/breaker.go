@@ -39,10 +39,11 @@ type Breaker struct {
 	cooldown    time.Duration
 	now         func() time.Time
 
-	mu       sync.Mutex
-	state    State
-	failures int
-	openedAt time.Time
+	mu               sync.Mutex
+	state            State
+	failures         int
+	openedAt         time.Time
+	halfOpenInFlight bool // a trial call is currently being attempted
 }
 
 // Option configures a Breaker.
@@ -78,24 +79,32 @@ func (b *Breaker) Call(fn func() error) error {
 	return err
 }
 
-// allow reports whether a call may proceed, transitioning Open →
-// HalfOpen when the cooldown has elapsed.
+// allow reports whether a call may proceed. It transitions Open →
+// HalfOpen when the cooldown has elapsed and admits exactly ONE trial:
+// while that trial is in flight, further callers are denied (so a
+// recovering dependency gets a single probe, not a fresh stampede).
 func (b *Breaker) allow() bool {
 	b.mu.Lock()
 	defer b.mu.Unlock()
-	if b.state == Open {
+	switch b.state {
+	case Open:
 		if b.now().Sub(b.openedAt) >= b.cooldown {
 			b.state = HalfOpen
-			return true // allow a single trial
+			b.halfOpenInFlight = true
+			return true // the single trial
 		}
 		return false
+	case HalfOpen:
+		return false // a trial is already in flight
+	default: // Closed
+		return true
 	}
-	return true // Closed or HalfOpen
 }
 
 func (b *Breaker) record(err error) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
+	b.halfOpenInFlight = false // the trial (if any) has completed
 	if err != nil {
 		b.failures++
 		// A failure in HalfOpen, or hitting the threshold in Closed,
