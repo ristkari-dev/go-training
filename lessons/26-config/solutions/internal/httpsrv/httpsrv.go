@@ -1,22 +1,11 @@
-// Package main is the lesson 26 logstats HTTP service (reference impl).
-//
-// Endpoints:
-//
-//	POST /ingest   {"lines":["<log line>", ...]}  → parse + accumulate
-//	GET  /stats    → {"counts":{...},"total":N}
-//	GET  /healthz  → {"status":"ok"}
-package main
+// Package httpsrv builds the logstats HTTP router — the service's HTTP
+// face, extracted so the unified daemon can mount it alongside gRPC.
+package httpsrv
 
 import (
-	"context"
 	"encoding/json"
-	"errors"
-	"io"
 	"log/slog"
-	"net"
 	"net/http"
-	"os"
-	"os/signal"
 	"time"
 
 	"github.com/ristkari-dev/go-training/lessons/26-config/solutions/internal/logparse"
@@ -40,7 +29,9 @@ type statsResponse struct {
 	Total  int            `json:"total"`
 }
 
-func newRouter(store *logstats.Store, logger *slog.Logger) http.Handler {
+// Router returns the HTTP handler for the logstats service (POST /ingest,
+// GET /stats, GET /healthz), wrapped in logging + recovery middleware.
+func Router(store *logstats.Store, logger *slog.Logger) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /ingest", ingestHandler(store))
 	mux.HandleFunc("GET /stats", statsHandler(store))
@@ -126,51 +117,4 @@ func withRecovery(next http.Handler, logger *slog.Logger) http.Handler {
 		}()
 		next.ServeHTTP(w, r)
 	})
-}
-
-func run(ctx context.Context, addr string, stdout io.Writer) error {
-	ln, err := net.Listen("tcp", addr)
-	if err != nil {
-		return err
-	}
-	return serve(ctx, ln, stdout)
-}
-
-func serve(ctx context.Context, ln net.Listener, stdout io.Writer) error {
-	logger := slog.New(slog.NewJSONHandler(stdout, nil))
-	store := logstats.NewStore()
-	srv := &http.Server{Handler: newRouter(store, logger)}
-
-	// Tie the shutdown goroutine to serve's lifetime: serveCancel on
-	// return guarantees it exits even if Serve fails for a reason other
-	// than our own Shutdown (otherwise it would block on <-ctx.Done()
-	// for the parent context's whole lifetime — a goroutine leak).
-	serveCtx, serveCancel := context.WithCancel(ctx)
-	defer serveCancel()
-	go func() {
-		<-serveCtx.Done()
-		shutCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-		_ = srv.Shutdown(shutCtx)
-	}()
-
-	logger.Info("listening", "addr", ln.Addr().String())
-	if err := srv.Serve(ln); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		return err
-	}
-	return nil
-}
-
-func main() {
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
-	defer stop()
-
-	addr := ":8080"
-	if len(os.Args) > 1 {
-		addr = os.Args[1]
-	}
-	if err := run(ctx, addr, os.Stdout); err != nil {
-		slog.Error("server failed", "err", err)
-		os.Exit(1)
-	}
 }

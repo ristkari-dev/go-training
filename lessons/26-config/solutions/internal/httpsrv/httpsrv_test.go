@@ -1,24 +1,20 @@
-package main
+package httpsrv
 
 import (
-	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log/slog"
-	"net"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"sync"
 	"testing"
-	"time"
 
 	"github.com/ristkari-dev/go-training/lessons/26-config/solutions/internal/logstats"
 )
 
 func testRouter() http.Handler {
-	return newRouter(logstats.NewStore(), slog.New(slog.NewJSONHandler(io.Discard, nil)))
+	return Router(logstats.NewStore(), slog.New(slog.NewJSONHandler(io.Discard, nil)))
 }
 
 func TestIngestThenStats(t *testing.T) {
@@ -111,43 +107,5 @@ func TestConcurrentIngestRace(t *testing.T) {
 	resp.Body.Close()
 	if sr.Counts["ERROR"] != 50 {
 		t.Errorf("ERROR = %d, want 50", sr.Counts["ERROR"])
-	}
-}
-
-func TestServeLifecycle(t *testing.T) {
-	ln, err := net.Listen("tcp", "127.0.0.1:0")
-	if err != nil {
-		t.Fatal(err)
-	}
-	ctx, cancel := context.WithCancel(context.Background())
-	errCh := make(chan error, 1)
-	go func() { errCh <- serve(ctx, ln, io.Discard) }()
-
-	url := fmt.Sprintf("http://%s/healthz", ln.Addr().String())
-	ready := false
-	deadline := time.Now().Add(2 * time.Second)
-	for time.Now().Before(deadline) {
-		if resp, err := http.Get(url); err == nil {
-			resp.Body.Close()
-			ready = true
-			break
-		}
-		time.Sleep(10 * time.Millisecond)
-	}
-	if !ready {
-		t.Fatal("server never became ready")
-	}
-
-	cancel()
-	select {
-	case err := <-errCh:
-		if err != nil {
-			t.Errorf("serve returned %v, want nil", err)
-		}
-	case <-time.After(10 * time.Second):
-		// Generous ceiling: serve waits on srv.Shutdown (up to 5s), so
-		// the test timeout must exceed it. With zero in-flight requests
-		// Shutdown returns near-instantly.
-		t.Fatal("serve did not return after cancel")
 	}
 }
