@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package greeter.v1;
+
+option go_package = "github.com/ristkari-dev/go-training/lessons/25-grpc/solutions/warmup/greeter/greeterpb";
+
+// Greeter is the lesson 25 warm-up: a minimal unary gRPC service.
+service Greeter {
+  rpc Greet(GreetRequest) returns (GreetReply);
+}
+
+message GreetRequest {
+  string name = 1;
+}
+
+message GreetReply {
+  string message = 1;
+}

@@ -12,6 +12,14 @@ linters:
     - unused
   exclusions:
     rules:
+      # Generated protobuf/gRPC code is not ours to lint.
+      - path: \.pb\.go$
+        linters:
+          - errcheck
+          - staticcheck
+          - unused
+          - govet
+          - ineffassign
       # Teaching examples often have intentionally simple main() functions.
       - path: lessons/.*/(exercises|solutions)/
         linters:

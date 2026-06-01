@@ -40,6 +40,22 @@ fmt: ## Format Go code with gofmt and goimports
 	gofmt -w .
 	goimports -w .
 
+.PHONY: proto
+proto: ## Regenerate protobuf/gRPC code (requires protoc + protoc-gen-go[-grpc])
+	@# Each .proto is compiled in its own invocation: the exercises and
+	@# solutions trees reuse the same proto package names, which would
+	@# collide if compiled as one unit. They are never linked together.
+	@for p in \
+	  lessons/25-grpc/exercises/proto/logstats.proto \
+	  lessons/25-grpc/solutions/proto/logstats.proto \
+	  lessons/25-grpc/exercises/warmup/greeter/greeter.proto \
+	  lessons/25-grpc/solutions/warmup/greeter/greeter.proto; do \
+	  echo "protoc $$p"; \
+	  protoc --go_out=. --go_opt=module=github.com/ristkari-dev/go-training \
+	         --go-grpc_out=. --go-grpc_opt=module=github.com/ristkari-dev/go-training \
+	         $$p || exit 1; \
+	done
+
 .PHONY: new-lesson
 new-lesson: ## Scaffold a new lesson (NAME=NN-name)
 	@test -n "$(NAME)" || (echo "usage: make new-lesson NAME=NN-name" && exit 1)
