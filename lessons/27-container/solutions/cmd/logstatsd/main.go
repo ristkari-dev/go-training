@@ -22,12 +22,22 @@ import (
 	"github.com/ristkari-dev/go-training/lessons/27-container/solutions/internal/httpsrv"
 	"github.com/ristkari-dev/go-training/lessons/27-container/solutions/internal/logstats"
 	pb "github.com/ristkari-dev/go-training/lessons/27-container/solutions/proto/logstatspb"
+	"github.com/ristkari-dev/go-training/lessons/27-container/solutions/warmup/buildinfo"
 	"github.com/ristkari-dev/go-training/lessons/27-container/solutions/warmup/config"
 )
 
 const drainTimeout = 10 * time.Second
 
 func main() {
+	// Pre-scan for -version/--version before config parsing so it works
+	// regardless of the config FlagSet.
+	for _, a := range os.Args[1:] {
+		if a == "-version" || a == "--version" {
+			fmt.Println(buildinfo.String())
+			return
+		}
+	}
+
 	cfg, err := config.Load(os.Args[1:], os.Getenv)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "config:", err)
