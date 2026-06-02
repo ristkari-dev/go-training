@@ -50,7 +50,9 @@ func Load(args []string, getenv func(string) string) (Config, error) {
 		return Config{}, err
 	}
 
-	// Layer 1: JSON config file (from -config flag or LOGSTATS_CONFIG env).
+	// Layer 1: JSON config file. The path comes from -config, falling
+	// back to LOGSTATS_CONFIG when -config is empty/unset (so `-config=`
+	// does not suppress the env path — omit both to use no file).
 	path := *configPath
 	if path == "" {
 		path = getenv("LOGSTATS_CONFIG")

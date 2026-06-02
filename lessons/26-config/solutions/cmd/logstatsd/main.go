@@ -99,19 +99,22 @@ func serve(ctx context.Context, httpSrv *http.Server, httpLis net.Listener, grpc
 		}
 	}()
 
-	drain := func() {
+	select {
+	case <-ctx.Done():
+		// Requested shutdown (SIGINT/SIGTERM): drain gracefully — finish
+		// in-flight work, bounded by drainTimeout so a stuck conn can't
+		// hang us past the orchestrator's grace period.
 		shutCtx, cancel := context.WithTimeout(context.Background(), drainTimeout)
 		defer cancel()
 		_ = httpSrv.Shutdown(shutCtx)
 		grpcSrv.GracefulStop()
-	}
-
-	select {
-	case <-ctx.Done():
-		drain()
 		return nil
 	case err := <-errCh:
-		drain()
+		// A server crashed: the service is already broken, so stop the
+		// other one IMMEDIATELY rather than waiting for in-flight work
+		// (an unbounded GracefulStop could hang on a stuck stream).
+		_ = httpSrv.Close()
+		grpcSrv.Stop()
 		return err
 	}
 }

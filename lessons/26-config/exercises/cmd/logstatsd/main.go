@@ -83,9 +83,8 @@ func run(ctx context.Context, cfg config.Config, stdout io.Writer) error {
 	return serve(ctx, httpSrv, httpLis, grpcSrv, grpcLis)
 }
 
-// serve runs both servers concurrently and drains BOTH when ctx is
-// cancelled. If either fails first, stop the other and return the error.
-// IMPLEMENT THIS.
+// serve runs both servers concurrently and stops BOTH when ctx is
+// cancelled (graceful) or when one of them fails (immediate). IMPLEMENT THIS.
 //
 // Hint:
 //
@@ -93,13 +92,17 @@ func run(ctx context.Context, cfg config.Config, stdout io.Writer) error {
 //	go func(){ if err := httpSrv.Serve(httpLis); err != nil && !errors.Is(err, http.ErrServerClosed) { errCh <- err } }()
 //	go func(){ if err := grpcSrv.Serve(grpcLis); err != nil { errCh <- err } }()
 //	select {
-//	case <-ctx.Done():           // graceful drain
+//	case <-ctx.Done():           // requested shutdown → drain gracefully, bounded
 //	    shutCtx, cancel := context.WithTimeout(context.Background(), drainTimeout); defer cancel()
 //	    httpSrv.Shutdown(shutCtx); grpcSrv.GracefulStop(); return nil
-//	case err := <-errCh:         // one failed → tear down the other
-//	    ... httpSrv.Shutdown(...); grpcSrv.GracefulStop(); return err
+//	case err := <-errCh:         // a server crashed → stop the other IMMEDIATELY
+//	    httpSrv.Close(); grpcSrv.Stop(); return err
 //	}
+//
+// Why immediate on the error path: the service is already broken, so
+// don't wait for in-flight work — an unbounded GracefulStop could hang
+// on a stuck stream.
 func serve(ctx context.Context, httpSrv *http.Server, httpLis net.Listener, grpcSrv *grpc.Server, grpcLis net.Listener) error {
 	_ = drainTimeout
-	panic("TODO: run both servers; on ctx.Done drain both (http.Shutdown + grpc.GracefulStop); on server error tear down the other")
+	panic("TODO: run both servers; on ctx.Done drain gracefully (http.Shutdown + grpc.GracefulStop); on server error stop both immediately (http.Close + grpc.Stop)")
 }
