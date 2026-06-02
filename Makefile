@@ -51,12 +51,32 @@ proto: ## Regenerate protobuf/gRPC code (requires protoc + protoc-gen-go[-grpc])
 	  lessons/25-grpc/exercises/warmup/greeter/greeter.proto \
 	  lessons/25-grpc/solutions/warmup/greeter/greeter.proto \
 	  lessons/26-config/exercises/proto/logstats.proto \
-	  lessons/26-config/solutions/proto/logstats.proto; do \
+	  lessons/26-config/solutions/proto/logstats.proto \
+	  lessons/27-container/exercises/proto/logstats.proto \
+	  lessons/27-container/solutions/proto/logstats.proto; do \
 	  echo "protoc $$p"; \
 	  protoc --go_out=. --go_opt=module=github.com/ristkari-dev/go-training \
 	         --go-grpc_out=. --go-grpc_opt=module=github.com/ristkari-dev/go-training \
 	         $$p || exit 1; \
 	done
+
+LOGSTATSD_PKG := github.com/ristkari-dev/go-training/lessons/27-container/solutions
+LDFLAGS := -X $(LOGSTATSD_PKG)/warmup/buildinfo.Version=$(shell git describe --tags --always --dirty 2>/dev/null || echo dev) \
+           -X $(LOGSTATSD_PKG)/warmup/buildinfo.Commit=$(shell git rev-parse --short HEAD 2>/dev/null || echo none) \
+           -X $(LOGSTATSD_PKG)/warmup/buildinfo.Date=$(shell git show -s --no-show-signature --format=%cI HEAD 2>/dev/null || echo unknown)
+
+.PHONY: build
+build: ## Build a version-stamped static logstatsd into bin/ (lesson 27)
+	CGO_ENABLED=0 go build -ldflags "$(LDFLAGS)" -o bin/logstatsd ./lessons/27-container/solutions/cmd/logstatsd
+	@echo "built bin/logstatsd"
+
+.PHONY: docker-build
+docker-build: ## Build the logstatsd container image (lesson 27)
+	docker build -f lessons/27-container/Dockerfile \
+	  --build-arg VERSION=$(shell git describe --tags --always --dirty 2>/dev/null || echo dev) \
+	  --build-arg COMMIT=$(shell git rev-parse --short HEAD 2>/dev/null || echo none) \
+	  --build-arg DATE=$(shell git show -s --no-show-signature --format=%cI HEAD 2>/dev/null || echo unknown) \
+	  -t logstatsd:$(shell git describe --tags --always --dirty 2>/dev/null || echo dev) .
 
 .PHONY: new-lesson
 new-lesson: ## Scaffold a new lesson (NAME=NN-name)
