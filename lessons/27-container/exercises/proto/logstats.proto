@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package logstats.v1;
+
+option go_package = "github.com/ristkari-dev/go-training/lessons/27-container/exercises/proto/logstatspb";
+
+// LogStats accepts log lines and reports per-level counts. It mirrors
+// the HTTP service's /ingest and /stats over a typed, streaming RPC API.
+service LogStats {
+  // Ingest streams many log lines and returns one summary (client-streaming).
+  rpc Ingest(stream LogLine) returns (IngestSummary);
+  // GetStats returns the accumulated per-level counts (unary).
+  rpc GetStats(StatsRequest) returns (StatsReply);
+}
+
+message LogLine {
+  string line = 1;
+}
+
+message IngestSummary {
+  int32 accepted = 1;
+  int32 parsed = 2;
+  int32 failed = 3;
+}
+
+message StatsRequest {}
+
+message StatsReply {
+  map<string, int32> counts = 1;
+  int32 total = 2;
+}
