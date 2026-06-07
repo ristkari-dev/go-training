@@ -9,6 +9,7 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/ristkari-dev/go-training/lessons/28-observability/solutions/internal/logparse"
 	"github.com/ristkari-dev/go-training/lessons/28-observability/solutions/internal/logstats"
@@ -68,6 +69,8 @@ func ingestHandler(store *logstats.Store, ingested metric.Int64Counter) http.Han
 			parsed++
 		}
 		store.Merge(delta)
+		// Throughput counter: all received lines (parsed + failed), not a
+		// success count — use the Parsed/Failed response fields for that.
 		ingested.Add(r.Context(), int64(parsed+failed))
 		writeJSON(w, http.StatusOK, ingestResponse{
 			Accepted: len(req.Lines), Parsed: parsed, Failed: failed,
@@ -101,7 +104,10 @@ func withRecovery(next http.Handler, logger *slog.Logger) http.Handler {
 		// before any bytes go out.
 		defer func() {
 			if v := recover(); v != nil {
-				logger.Error("panic recovered", "value", v, "path", r.URL.Path)
+				// Correlate the panic log with its trace (Concept 5): the
+				// active span's ctx is on the request by the time recovery runs.
+				logger.Error("panic recovered", "value", v, "path", r.URL.Path,
+					"trace_id", trace.SpanFromContext(r.Context()).SpanContext().TraceID().String())
 				http.Error(w, "internal server error", http.StatusInternalServerError)
 			}
 		}()

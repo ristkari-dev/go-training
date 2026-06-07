@@ -19,6 +19,10 @@ import (
 // Setup builds global tracer + meter providers that export to w (stdout
 // in production) and returns a shutdown func that flushes both. IMPLEMENT THIS.
 //
+// ctx is accepted for the context-aware initialization a production setup
+// adds — resource detection or dialing an OTLP exporter (see "Going
+// further"). The stdout exporters here don't need it.
+//
 // Hint:
 //
 //	traceExp, _ := stdouttrace.New(stdouttrace.WithWriter(w))

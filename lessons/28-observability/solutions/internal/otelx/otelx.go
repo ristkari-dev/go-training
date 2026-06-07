@@ -20,7 +20,13 @@ import (
 
 // Setup builds global tracer + meter providers exporting to w and
 // returns a shutdown func that flushes both.
+//
+// ctx is accepted for the context-aware initialization a production setup
+// adds — resource detection (resource.New(ctx, ...)) or dialing an OTLP
+// exporter — even though the stdout exporters here don't use it. See
+// "Going further" in the README.
 func Setup(ctx context.Context, w io.Writer) (func(context.Context) error, error) {
+	_ = ctx
 	traceExp, err := stdouttrace.New(stdouttrace.WithWriter(w))
 	if err != nil {
 		return nil, err
