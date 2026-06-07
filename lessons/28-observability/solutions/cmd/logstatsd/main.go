@@ -21,6 +21,7 @@ import (
 	"github.com/ristkari-dev/go-training/lessons/28-observability/solutions/internal/grpcsrv"
 	"github.com/ristkari-dev/go-training/lessons/28-observability/solutions/internal/httpsrv"
 	"github.com/ristkari-dev/go-training/lessons/28-observability/solutions/internal/logstats"
+	"github.com/ristkari-dev/go-training/lessons/28-observability/solutions/internal/otelx"
 	pb "github.com/ristkari-dev/go-training/lessons/28-observability/solutions/proto/logstatspb"
 	"github.com/ristkari-dev/go-training/lessons/28-observability/solutions/warmup/buildinfo"
 	"github.com/ristkari-dev/go-training/lessons/28-observability/solutions/warmup/config"
@@ -71,6 +72,15 @@ func newLogger(level string, w io.Writer) *slog.Logger {
 func run(ctx context.Context, cfg config.Config, stdout io.Writer) error {
 	logger := newLogger(cfg.LogLevel, stdout)
 	logger.Info("starting logstatsd", "config", cfg) // redacted via Config.LogValue
+
+	// Wire OpenTelemetry (traces + metrics → stdout). Must run before the
+	// servers are built, since their meters/tracers come from the global
+	// providers Setup installs. shutdown flushes batched data on exit.
+	shutdown, err := otelx.Setup(ctx, stdout)
+	if err != nil {
+		return fmt.Errorf("otel setup: %w", err)
+	}
+	defer func() { _ = shutdown(context.Background()) }()
 
 	store := logstats.NewStore()
 

@@ -6,10 +6,13 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
-	"time"
+
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/metric"
 
 	"github.com/ristkari-dev/go-training/lessons/28-observability/exercises/internal/logparse"
 	"github.com/ristkari-dev/go-training/lessons/28-observability/exercises/internal/logstats"
+	"github.com/ristkari-dev/go-training/lessons/28-observability/exercises/internal/otelx"
 )
 
 const maxIngestBytes = 1 << 20
@@ -30,16 +33,22 @@ type statsResponse struct {
 }
 
 // Router returns the HTTP handler for the logstats service (POST /ingest,
-// GET /stats, GET /healthz), wrapped in logging + recovery middleware.
+// GET /stats, GET /healthz), wrapped in OpenTelemetry instrumentation
+// (span + request metrics + trace-correlated logging) and panic recovery.
 func Router(store *logstats.Store, logger *slog.Logger) http.Handler {
+	// ingested_lines_total: a metric recorded where the domain event
+	// happens (parsing). Created once; the MeterProvider must already be
+	// set (the daemon calls otelx.Setup before building the router).
+	ingested, _ := otel.Meter("logstatsd").Int64Counter("ingested_lines_total")
+
 	mux := http.NewServeMux()
-	mux.HandleFunc("POST /ingest", ingestHandler(store))
+	mux.HandleFunc("POST /ingest", ingestHandler(store, ingested))
 	mux.HandleFunc("GET /stats", statsHandler(store))
 	mux.HandleFunc("GET /healthz", healthHandler)
-	return withRequestLog(withRecovery(mux, logger), logger)
+	return otelx.Instrument(withRecovery(mux, logger), logger)
 }
 
-func ingestHandler(store *logstats.Store) http.HandlerFunc {
+func ingestHandler(store *logstats.Store, ingested metric.Int64Counter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req ingestRequest
 		dec := json.NewDecoder(http.MaxBytesReader(w, r.Body, maxIngestBytes))
@@ -59,6 +68,7 @@ func ingestHandler(store *logstats.Store) http.HandlerFunc {
 			parsed++
 		}
 		store.Merge(delta)
+		ingested.Add(r.Context(), int64(parsed+failed))
 		writeJSON(w, http.StatusOK, ingestResponse{
 			Accepted: len(req.Lines), Parsed: parsed, Failed: failed,
 		})
@@ -80,26 +90,6 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(v)
-}
-
-type statusRecorder struct {
-	http.ResponseWriter
-	status int
-}
-
-func (s *statusRecorder) WriteHeader(code int) {
-	s.status = code
-	s.ResponseWriter.WriteHeader(code)
-}
-
-func withRequestLog(next http.Handler, logger *slog.Logger) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		start := time.Now()
-		rec := &statusRecorder{ResponseWriter: w, status: http.StatusOK}
-		next.ServeHTTP(rec, r)
-		logger.Info("request", "method", r.Method, "path", r.URL.Path,
-			"status", rec.status, "duration_ms", time.Since(start).Milliseconds())
-	})
 }
 
 func withRecovery(next http.Handler, logger *slog.Logger) http.Handler {
