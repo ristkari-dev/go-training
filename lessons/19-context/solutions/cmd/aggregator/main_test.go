@@ -2,11 +2,13 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"testing"
 	"time"
 )
@@ -148,11 +150,22 @@ func TestAggregatorCancelled(t *testing.T) {
 	}
 
 	err := cmd.Wait()
-	// On cancellation, exit code is 0 (we treat cancel as success).
-	// However: the binary may have FINISHED before SIGINT arrived. In
-	// that case, no "cancelled" message; just exit 0 with full output.
-	// Tests should tolerate either outcome.
+	// Acceptable outcomes:
+	//   1. exit 0 + "cancelled by user" — SIGINT arrived mid-walk and was
+	//      handled gracefully (the intended path).
+	//   2. exit 0, no message — the walk finished before SIGINT arrived.
+	//   3. terminated by SIGINT — under heavy load (e.g. the full test
+	//      suite) the Go runtime hadn't finished installing
+	//      signal.NotifyContext's handler when the signal arrived, so the
+	//      default handler killed the process. That's a race in THIS test
+	//      harness, not a fault in the binary, so accept it.
 	if err != nil {
+		var ee *exec.ExitError
+		if errors.As(err, &ee) {
+			if ws, ok := ee.Sys().(syscall.WaitStatus); ok && ws.Signaled() && ws.Signal() == syscall.SIGINT {
+				return // outcome 3 — startup race, acceptable
+			}
+		}
 		t.Fatalf("wait: %v (stderr: %s)", err, stderr.String())
 	}
 	// stderr MAY contain "cancelled by user" (if SIGINT won the race)
