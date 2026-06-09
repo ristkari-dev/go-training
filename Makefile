@@ -55,7 +55,9 @@ proto: ## Regenerate protobuf/gRPC code (requires protoc + protoc-gen-go[-grpc])
 	  lessons/27-container/exercises/proto/logstats.proto \
 	  lessons/27-container/solutions/proto/logstats.proto \
 	  lessons/28-observability/exercises/proto/logstats.proto \
-	  lessons/28-observability/solutions/proto/logstats.proto; do \
+	  lessons/28-observability/solutions/proto/logstats.proto \
+	  lessons/29-capstone-final/exercises/proto/logstats.proto \
+	  lessons/29-capstone-final/solutions/proto/logstats.proto; do \
 	  echo "protoc $$p"; \
 	  protoc --go_out=. --go_opt=module=github.com/ristkari-dev/go-training \
 	         --go-grpc_out=. --go-grpc_opt=module=github.com/ristkari-dev/go-training \
