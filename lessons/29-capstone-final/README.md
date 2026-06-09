@@ -126,7 +126,7 @@ A **fresh key per retry** — dedup never fires, and you're back to duplicates. 
 ```go
 func (f *Forwarder) Send(ctx context.Context, lines []string) error {
     f.seq++
-    f.outbox = append(f.outbox, batch{key: f.key(), lines: lines})  // record intent
+    f.outbox = append(f.outbox, batch{key: fmt.Sprintf("%s-%d", f.id, f.seq), lines: lines})  // record intent
     return f.flush(ctx)                                             // then send
 }
 
