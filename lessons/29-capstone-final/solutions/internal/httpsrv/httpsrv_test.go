@@ -11,10 +11,15 @@ import (
 	"testing"
 
 	"github.com/ristkari-dev/go-training/lessons/29-capstone-final/solutions/internal/logstats"
+	"github.com/ristkari-dev/go-training/lessons/29-capstone-final/solutions/warmup/dedup"
 )
 
+func discardLogger() *slog.Logger {
+	return slog.New(slog.NewJSONHandler(io.Discard, nil))
+}
+
 func testRouter() http.Handler {
-	return Router(logstats.NewStore(), slog.New(slog.NewJSONHandler(io.Discard, nil)))
+	return Router(logstats.NewStore(), dedup.New(1000), discardLogger())
 }
 
 func TestIngestThenStats(t *testing.T) {
@@ -108,4 +113,85 @@ func TestConcurrentIngestRace(t *testing.T) {
 	if sr.Counts["ERROR"] != 50 {
 		t.Errorf("ERROR = %d, want 50", sr.Counts["ERROR"])
 	}
+}
+
+func TestIdempotentSameKeyCountedOnce(t *testing.T) {
+	srv := httptest.NewServer(Router(logstats.NewStore(), dedup.New(1000), discardLogger()))
+	defer srv.Close()
+	body := `{"lines":["2026-01-02T15:04:05 INFO a","2026-01-02T15:04:06 WARN b"]}`
+	r1 := postKey(t, srv.URL, "k1", body)
+	r2 := postKey(t, srv.URL, "k1", body)
+	if r1.Duplicate || !r2.Duplicate {
+		t.Errorf("dup flags: r1=%v r2=%v (want false,true)", r1.Duplicate, r2.Duplicate)
+	}
+	if got := totalStat(t, srv.URL); got != 2 {
+		t.Errorf("total = %d, want 2 (counted once)", got)
+	}
+}
+
+func TestDifferentKeysCountedTwice(t *testing.T) {
+	srv := httptest.NewServer(Router(logstats.NewStore(), dedup.New(1000), discardLogger()))
+	defer srv.Close()
+	body := `{"lines":["2026-01-02T15:04:05 INFO a","2026-01-02T15:04:06 WARN b"]}`
+	r1 := postKey(t, srv.URL, "k1", body)
+	r2 := postKey(t, srv.URL, "k2", body)
+	if r1.Duplicate || r2.Duplicate {
+		t.Errorf("dup flags: r1=%v r2=%v (want false,false)", r1.Duplicate, r2.Duplicate)
+	}
+	if got := totalStat(t, srv.URL); got != 4 {
+		t.Errorf("total = %d, want 4 (distinct keys counted)", got)
+	}
+}
+
+func TestNoKeyCountedEachTime(t *testing.T) {
+	srv := httptest.NewServer(Router(logstats.NewStore(), dedup.New(1000), discardLogger()))
+	defer srv.Close()
+	body := `{"lines":["2026-01-02T15:04:05 INFO a","2026-01-02T15:04:06 WARN b"]}`
+	r1 := postKey(t, srv.URL, "", body)
+	r2 := postKey(t, srv.URL, "", body)
+	if r1.Duplicate || r2.Duplicate {
+		t.Errorf("dup flags: r1=%v r2=%v (want false,false)", r1.Duplicate, r2.Duplicate)
+	}
+	if got := totalStat(t, srv.URL); got != 4 {
+		t.Errorf("total = %d, want 4 (no key, no dedup)", got)
+	}
+}
+
+// postKey POSTs body to /ingest, setting Idempotency-Key when key != "",
+// and decodes the ingestResponse.
+func postKey(t *testing.T, baseURL, key, body string) ingestResponse {
+	t.Helper()
+	req, err := http.NewRequest(http.MethodPost, baseURL+"/ingest", strings.NewReader(body))
+	if err != nil {
+		t.Fatalf("new request: %v", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+	if key != "" {
+		req.Header.Set("Idempotency-Key", key)
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("post: %v", err)
+	}
+	defer resp.Body.Close()
+	var ir ingestResponse
+	if err := json.NewDecoder(resp.Body).Decode(&ir); err != nil {
+		t.Fatalf("decode ingest resp: %v", err)
+	}
+	return ir
+}
+
+// totalStat GETs /stats and returns the total line count.
+func totalStat(t *testing.T, baseURL string) int {
+	t.Helper()
+	resp, err := http.Get(baseURL + "/stats")
+	if err != nil {
+		t.Fatalf("get stats: %v", err)
+	}
+	defer resp.Body.Close()
+	var sr statsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&sr); err != nil {
+		t.Fatalf("decode stats: %v", err)
+	}
+	return sr.Total
 }

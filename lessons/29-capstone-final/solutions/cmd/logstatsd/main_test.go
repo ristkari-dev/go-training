@@ -17,6 +17,7 @@ import (
 	"github.com/ristkari-dev/go-training/lessons/29-capstone-final/solutions/internal/httpsrv"
 	"github.com/ristkari-dev/go-training/lessons/29-capstone-final/solutions/internal/logstats"
 	pb "github.com/ristkari-dev/go-training/lessons/29-capstone-final/solutions/proto/logstatspb"
+	"github.com/ristkari-dev/go-training/lessons/29-capstone-final/solutions/warmup/dedup"
 )
 
 func TestServe(t *testing.T) {
@@ -31,7 +32,7 @@ func TestServe(t *testing.T) {
 
 	logger := slog.New(slog.NewJSONHandler(io.Discard, nil))
 	store := logstats.NewStore()
-	httpSrv := &http.Server{Handler: httpsrv.Router(store, logger)}
+	httpSrv := &http.Server{Handler: httpsrv.Router(store, dedup.New(1000), logger)}
 	grpcSrv := grpc.NewServer()
 	pb.RegisterLogStatsServer(grpcSrv, grpcsrv.New(store))
 

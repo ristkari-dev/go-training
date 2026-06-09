@@ -14,6 +14,7 @@ import (
 	"github.com/ristkari-dev/go-training/lessons/29-capstone-final/exercises/internal/logparse"
 	"github.com/ristkari-dev/go-training/lessons/29-capstone-final/exercises/internal/logstats"
 	"github.com/ristkari-dev/go-training/lessons/29-capstone-final/exercises/internal/otelx"
+	"github.com/ristkari-dev/go-training/lessons/29-capstone-final/exercises/warmup/dedup"
 )
 
 const maxIngestBytes = 1 << 20
@@ -23,9 +24,10 @@ type ingestRequest struct {
 }
 
 type ingestResponse struct {
-	Accepted int `json:"accepted"`
-	Parsed   int `json:"parsed"`
-	Failed   int `json:"failed"`
+	Accepted  int  `json:"accepted"`
+	Parsed    int  `json:"parsed"`
+	Failed    int  `json:"failed"`
+	Duplicate bool `json:"duplicate,omitempty"`
 }
 
 type statsResponse struct {
@@ -36,21 +38,28 @@ type statsResponse struct {
 // Router returns the HTTP handler for the logstats service (POST /ingest,
 // GET /stats, GET /healthz), wrapped in OpenTelemetry instrumentation
 // (span + request metrics + trace-correlated logging) and panic recovery.
-func Router(store *logstats.Store, logger *slog.Logger) http.Handler {
+func Router(store *logstats.Store, dd *dedup.Store, logger *slog.Logger) http.Handler {
 	// ingested_lines_total: a metric recorded where the domain event
 	// happens (parsing). Created once; the MeterProvider must already be
 	// set (the daemon calls otelx.Setup before building the router).
 	ingested, _ := otel.Meter("logstatsd").Int64Counter("ingested_lines_total")
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("POST /ingest", ingestHandler(store, ingested))
+	mux.HandleFunc("POST /ingest", ingestHandler(store, dd, ingested))
 	mux.HandleFunc("GET /stats", statsHandler(store))
 	mux.HandleFunc("GET /healthz", healthHandler)
 	return otelx.Instrument(withRecovery(mux, logger), logger)
 }
 
-func ingestHandler(store *logstats.Store, ingested metric.Int64Counter) http.HandlerFunc {
+func ingestHandler(store *logstats.Store, dd *dedup.Store, ingested metric.Int64Counter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Idempotency: a repeat Idempotency-Key is acknowledged without
+		// re-counting, so an at-least-once forwarder's retries land
+		// effectively once. Checked before decoding so a dup is cheap.
+		if key := r.Header.Get("Idempotency-Key"); key != "" && dd.Seen(key) {
+			writeJSON(w, http.StatusOK, ingestResponse{Duplicate: true})
+			return
+		}
 		var req ingestRequest
 		dec := json.NewDecoder(http.MaxBytesReader(w, r.Body, maxIngestBytes))
 		if err := dec.Decode(&req); err != nil {

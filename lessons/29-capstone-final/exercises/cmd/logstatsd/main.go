@@ -24,6 +24,7 @@ import (
 	pb "github.com/ristkari-dev/go-training/lessons/29-capstone-final/exercises/proto/logstatspb"
 	"github.com/ristkari-dev/go-training/lessons/29-capstone-final/exercises/warmup/buildinfo"
 	"github.com/ristkari-dev/go-training/lessons/29-capstone-final/exercises/warmup/config"
+	"github.com/ristkari-dev/go-training/lessons/29-capstone-final/exercises/warmup/dedup"
 )
 
 const drainTimeout = 10 * time.Second
@@ -82,6 +83,9 @@ func run(ctx context.Context, cfg config.Config, stdout io.Writer) error {
 	defer func() { _ = shutdown(context.Background()) }()
 
 	store := logstats.NewStore()
+	// Seen-key set for /ingest idempotency. gRPC does NOT dedup — only the
+	// HTTP face carries Idempotency-Key (it's the forwarder's target).
+	dd := dedup.New(100000)
 
 	httpLis, err := net.Listen("tcp", cfg.HTTPAddr)
 	if err != nil {
@@ -92,7 +96,7 @@ func run(ctx context.Context, cfg config.Config, stdout io.Writer) error {
 		return fmt.Errorf("grpc listen: %w", err)
 	}
 
-	httpSrv := &http.Server{Handler: httpsrv.Router(store, logger)}
+	httpSrv := &http.Server{Handler: httpsrv.Router(store, dd, logger)}
 	grpcSrv := grpc.NewServer(
 		grpc.UnaryInterceptor(grpcsrv.LoggingUnaryInterceptor(logger)),
 		grpc.StreamInterceptor(grpcsrv.LoggingStreamInterceptor(logger)),
